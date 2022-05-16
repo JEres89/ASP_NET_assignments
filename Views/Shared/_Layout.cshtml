@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" type="text/css" href="/lib/bootstrap/css/bootstrap.css" />
+</head>
+<body class="vw-100 vh-100">
+	<div class="container vw-100 vh-100" style="height:100vh;">
+		<header>
+			<nav class="navbar navbar-expand w-100" style="height:100px;">
+				<div class="container w-100">
+					<div class="row align-items-end w-100">
+						<div class="col-2" style="width:100px;">
+							<a class="navbar-brand d-inline-block" asp-controller="Home" asp-action="Index">J.E</a>
+						</div>
+						<div class="col-6">
+							<ul class="navbar-nav">
+								<li class="nav-item">
+									<a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" asp-controller="Home" asp-action="About">About</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link " asp-controller="Home" asp-action="Projects">Projects</a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link " href="/GuessingGame">Guessing Game</a>
+								</li>
+							</ul>
+						</div>
+						<div class="col-1 justify-content-end">
+							<a href="/FeverCheck" class="nav-link">Fever?</a>
+						</div>
+					</div>
+				</div>
+			</nav>
+		</header>
+		<div class="container" style="height: 600px;">
+			@RenderBody()
+		</div>
+		<footer>
+			<div style="height:200px;">
+				<p>@DateTime.Now.ToString("D")</p>
+				<p>&copy;Jens Eresund</p>
+			</div>
+		</footer>
+	</div>
+</body>
+</html>
