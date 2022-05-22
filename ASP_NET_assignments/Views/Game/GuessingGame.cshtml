@@ -1,0 +1,39 @@
+﻿@{
+	ViewData["Title"] = "Guessing Game";
+}
+
+<h1>The Number Guessing Game!</h1>
+
+@if(ViewBag.message != null)
+{
+	<p>@ViewBag.message</p>
+}
+
+@if(ViewBag.win != null)
+{
+	<a href="/Game/GuessingGame">
+		<input  type="button" value="Play again" />
+	</a>
+}
+else
+{
+	<form asp-controller="Game" asp-action="GuessingGame" method="post">
+		<fieldset>
+			<legend>The Guessing Game</legend>
+			<p>Enter your guess!</p>
+			<label>Guess </label><input type="text" name="guess" />
+			<input type="submit" value="Guess!" />
+		</fieldset>
+	</form>
+}
+
+@if(ViewBag.guesses != null)
+{
+	<h3>Your previous guesses</h3>
+	<ol>
+		@foreach(string guess in ( (string)ViewBag.guesses ).Split(',', StringSplitOptions.RemoveEmptyEntries))
+		{
+			<li>@guess</li>
+		}
+	</ol>
+}

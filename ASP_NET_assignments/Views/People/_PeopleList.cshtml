@@ -1,0 +1,31 @@
+﻿@model PeopleModel
+
+@{
+	ViewData["Title"] = "People List";
+}
+
+<table id="peopleData">
+	<thead>
+		<tr>
+			@foreach(string postName in Model.postNames)
+			{
+				<th>@postName</th>
+			}
+			<th>X</th>
+		</tr>
+	</thead>
+
+	@for(int i = 0 ; i < Model.PeopleData.Count; i++)
+	{
+		string[] row = Model.PeopleData[i];
+
+		<tr id="peopleData_row @i">
+			@foreach(string post in row)
+			{
+				<td>@post</td>
+			}
+			<td><button name="delete_row">Remove</button></td>
+		</tr>
+	}
+</table>
+
