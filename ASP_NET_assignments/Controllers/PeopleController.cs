@@ -44,12 +44,18 @@ namespace ASP_NET_assignments.Controllers
 
 			return PartialView("_PeopleList", model);
 		}
+		[HttpGet]
 		public IActionResult Details(int id)
 		{
-
-			return View();
+			PeopleModel model = PeopleModel.GetSessionModel(HttpContext.Session.Id);
+			if(id == 0 || !model.SetPerson(id))
+			{
+				var json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
+				json.StatusCode = 404;
+				return json;
+			}
+			return PartialView("_person", model);
 		}
-
 
 		public IActionResult Create(IFormCollection formData)
 		{
@@ -58,18 +64,23 @@ namespace ASP_NET_assignments.Controllers
 
 			return PartialView("_PeopleList", model);
 		}
-
-		public IActionResult Edit(int id)
-		{
-			return View();
-		}
-
+		[HttpPost]
 		public IActionResult Delete(int id)
 		{
 			PeopleModel model = PeopleModel.GetSessionModel(HttpContext.Session.Id);
-			model.RemovePerson(id);
-
-			return PartialView("_PeopleList", model);
+			if(model.RemovePerson(id))
+			{
+				var json = Json($"<p>Person with ID {id} has been removed from the database.</p>");
+				json.StatusCode = 200;
+				return json;
+			}
+			else
+			{
+				var json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
+				json.StatusCode = 404;
+				return json;
+			}
+			
 		}
 
 	}

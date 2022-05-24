@@ -8,13 +8,13 @@ namespace ASP_NET_assignments.Models
 	public class PeopleModel 
 	{
 		private static readonly Dictionary<string, PeopleModel> cache = new Dictionary<string, PeopleModel>();
-		private string _sessionId;
+		private string _databaseId;
 		public string[] postNames;
-		private List<string[]> peopleData;
-		private readonly List<string[]> selectedPeopleData;
+		private Dictionary<int, string[]> peopleData;
+		private readonly Dictionary<int, string[]> selectedPeopleData;
 
-		private readonly SearchModel<List<string[]>, string[]> searchModel;
-		public List<string[]> PeopleData
+		private readonly SearchModel<Dictionary<int, string[]>, string[]> searchModel;
+		public Dictionary<int, string[]> PeopleData
 		{
 			get
 			{
@@ -26,9 +26,44 @@ namespace ASP_NET_assignments.Models
 			}
 			private set => peopleData =  value ;
 		}
+		private IEnumerator<KeyValuePair<int, string[]>> E_people;
+		private bool listEnd = false;
+		public bool ListEnd
+		{
+			get => listEnd;
+			private set => listEnd = value ;
+		}
+		public KeyValuePair<int, string[]> GetPerson
+		{
+			get
+			{
+				if(ListEnd)
+				{
+					return new KeyValuePair<int, string[]>();
+				}
+				KeyValuePair<int, string[]> person = E_people.Current;
+				ListEnd = !E_people.MoveNext();
+
+				return person;
+			}
+		}
+		public bool SetPerson(int id)
+		{
+			Reset();
+			while(E_people.Current.Key != id)
+			{
+				if(!E_people.MoveNext())
+				{
+					Reset();
+					return false;
+				}
+			}
+			return true;
+		}
 
 		public static PeopleModel GetSessionModel(string sessionId)
 		{
+			sessionId = "dummyId";
 			if(!cache.TryGetValue(sessionId, out PeopleModel model))
 			{
 				model = new PeopleModel(sessionId);
@@ -37,35 +72,29 @@ namespace ASP_NET_assignments.Models
 			}
 			return model;
 		}
-		private PeopleModel(string sessionId)
+		private PeopleModel(string databaseId)
 		{
-			_sessionId = sessionId;
-			var session = VirtualDatabase.GetSessionData(sessionId);
+			_databaseId = databaseId;
+			var session = VirtualDatabase.GetDatabase(_databaseId);
 			postNames = session.postNames;
 			PeopleData = session.data;
-			List<string[]> searchCollection = new List<string[]>();
-			searchModel = new SearchModel<List<string[]>, string[]>(ref peopleData, searchCollection);
+			Dictionary<int, string[]> searchCollection = new Dictionary<int, string[]>();
+			searchModel = new SearchModel<Dictionary<int, string[]>, string[]>(ref peopleData, searchCollection);
 			selectedPeopleData = searchCollection;
-
+			Reset();
 		}
-		//public PeopleModel(string sessionId) : this(
-		//	sessionId,
-		//	new List<string[]>(new string[][]
-		//	{
-		//		new string[] {"Jens Eresund", "+46706845909", "Göteborg"},
-		//		new string[] {"Abel Abrahamsson", "+00123456789", "Staden"},
-		//		new string[] {"Bror Björn", "+5555555555", "Skogen"},
-		//		new string[] {"Örjan Örn", "1111111111", "Luftslottet"}
-		//	}),
-		//	new string[]
-		//	{
-		//		"Name", "Phonenumber", "City of Residence"
-		//	})
-		//{
-		//}
+
+		public void Reset()
+		{
+			searchModel.ClearSearch();
+			E_people = peopleData.GetEnumerator();
+			ListEnd = false;
+		}
 		public void Search(string value)
 		{
 			searchModel.Search(value);
+			E_people = selectedPeopleData.GetEnumerator();
+			ListEnd = false;
 		}
 
 		public void AddPerson(IFormCollection formData)
@@ -76,13 +105,14 @@ namespace ASP_NET_assignments.Models
 				formData["createPhone"],
 				formData["createCity"]
 			};
-			peopleData.Add(data);
-			searchModel.RenewSearch();
+			VirtualDatabase.AppendData(_databaseId, data);
+			Reset();
 		}
-		public void RemovePerson(int index)
+		public bool RemovePerson(int id)
 		{
-			peopleData.RemoveAt(index);
-			searchModel.RenewSearch();
+			bool success = VirtualDatabase.RemoveData(_databaseId, id);
+			Reset();
+			return success;
 		}
 	}
 }

@@ -2,9 +2,29 @@
 
 @{
 	ViewData["Title"] = "People List";
+	var postNames = Model.postNames;
+	_ = Model.GetPerson;
 }
 
-<table id="peopleData">
+<div id="peopleList" class="container">
+	<div class="row" id="columnNames">
+		<div class="col personId">
+			Person ID
+		</div>
+		@for(int i = 0 ; i < postNames.Length ; i++)
+		{
+		<div class="col @postNames[i]">
+			@postNames[i]
+		</div>
+		}
+	</div>
+	@while(!Model.ListEnd)
+	{
+		<partial name="_person" model="Model" />
+	}
+</div>
+
+@*<table id="peopleData">
 	<thead>
 		<tr>
 			@foreach(string postName in Model.postNames)
@@ -15,7 +35,7 @@
 		</tr>
 	</thead>
 
-	@for(int i = 0 ; i < Model.PeopleData.Count; i++)
+	@for(int i = 0 ; i < Model.PeopleData.Count ; i++)
 	{
 		string[] row = Model.PeopleData[i];
 
@@ -27,5 +47,4 @@
 			<td><button name="delete_row">Remove</button></td>
 		</tr>
 	}
-</table>
-
+</table>*@

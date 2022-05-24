@@ -13,7 +13,7 @@ namespace ASP_NET_assignments.Models
 	 * and int[] searchIndexes with List<key> searchKeys
 	 * to accomodate variable length database rows.
 	 */
-	public class SearchModel<T1, T2> where T1 : ICollection<T2> where T2 : IList<string>
+	public class SearchModel<T1, T2> where T1 : IDictionary<int, T2> where T2 : IList<string>
 	{
 		readonly T1 dataSet;
 		private int[] searchIndexes = {-1};
@@ -37,7 +37,7 @@ namespace ASP_NET_assignments.Models
 		// <searchValue, 
 		//Func<string, string, bool> GetValue;
 
-		public SearchModel(ref T1 data, T1 searchCollection)//, Func<string, string, bool> getValue)
+		public SearchModel(ref T1 data, T1 searchCollection)
 		{
 			dataSet = data;
 			result = searchCollection;
@@ -49,6 +49,7 @@ namespace ASP_NET_assignments.Models
 		}
 		public void ClearSearch()
 		{
+			lastSearch = string.Empty;
 			HasSearched = false;
 			result.Clear();
 		}
@@ -74,11 +75,12 @@ namespace ASP_NET_assignments.Models
 			{
 				// Detta ger ett mystiskt cast error i runtime, men utan (T1) blir det implicit 
 				// cast error från compilern och den föreslår (T1) cast som lösning (??)
-				// Result = (T1)dataSet.Where(row => row.Any(post => post.Contains(value)));
 
-				foreach(T2 row in dataSet)
+				// Result = (T1)dataSet.Where(row => row.Any(post => post.Contains(value)));
+				
+				foreach(var row in dataSet)
 				{
-					if(row.Any(post => post.Contains(value)))
+					if(row.Value.Any(post => post.Contains(value)))
 					{
 						result.Add(row);
 					}
@@ -93,11 +95,11 @@ namespace ASP_NET_assignments.Models
 				//		return false;
 				//	});
 
-				foreach(T2 row in dataSet)
+				foreach(var row in dataSet)
 				{
 					foreach(int i in searchIndexes)
 					{
-						if(row[i].Contains(value))
+						if(row.Value[i].Contains(value))
 						{
 							result.Add(row);
 							break;
@@ -110,9 +112,9 @@ namespace ASP_NET_assignments.Models
 			{
 				//Result = (T1)dataSet.Where(row => row[searchIndexes[0]].Contains(value));
 
-				foreach(T2 row in dataSet)
+				foreach(var row in dataSet)
 				{
-					if(row[searchIndexes[0]].Contains(value))
+					if(row.Value[searchIndexes[0]].Contains(value))
 					{
 						result.Add(row);
 					}
