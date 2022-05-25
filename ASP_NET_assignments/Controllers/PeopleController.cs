@@ -18,7 +18,7 @@ namespace ASP_NET_assignments.Controllers
 			return View("People", PeopleModel.GetSessionModel(HttpContext.Session.Id));
 		}
 
-		[HttpPost]
+		//[HttpPost]
 		public IActionResult FormSubmit(IFormCollection formData)
 		{
 			if(formData.TryGetValue("formName", out StringValues target))
@@ -27,8 +27,8 @@ namespace ASP_NET_assignments.Controllers
 				{
 					case "searchPerson":
 						return Search(formData);
-					case "createPerson":
-						return Create(formData);
+					//case "createPerson":
+						//return Create(formData);
 					default:
 						break;
 				}
@@ -54,16 +54,32 @@ namespace ASP_NET_assignments.Controllers
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_person", model.GetPerson.Value);
+			return PartialView("_person", model.GetPerson);
 		}
 
-		public IActionResult Create(IFormCollection formData)
+		[ValidateAntiForgeryToken]
+		[HttpPost]
+		public IActionResult Create(Person person)
 		{
 			PeopleModel model = PeopleModel.GetSessionModel(HttpContext.Session.Id);
-			model.AddPerson(formData);
-
-			return PartialView("_PeopleList", model);
+			if(ModelState.IsValid)
+			{
+				model.AddPerson(person);
+				ViewBag.addPersonResult = "<p>Successfully added the new person</p>";
+				return View("People", model);
+			}
+			else
+			{
+				ViewBag.addPersonResult = "<p>Incorrect form data</p>";
+				return View("People", model);
+			}
 		}
+		[HttpGet]
+		public IActionResult Create()
+		{
+			return PartialView("CreatePersonView");
+		}
+
 		[HttpPost]
 		public IActionResult Delete(int id)
 		{

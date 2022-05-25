@@ -28,23 +28,27 @@ namespace ASP_NET_assignments.Models
 			databaseId = "dummyId";
 			if(!_virtualDatabases.TryGetValue(databaseId, out var list))
 			{
-				list.postNames = new string[] { "Name", "Phonenumber", "City of Residence" };
-				list.data = new Dictionary<int, Person>
-				(
-					new KeyValuePair<int, Person>[]
-					{
-						new KeyValuePair<int, Person>( RandId, new Person(randId, "Jens Eresund", "+46706845909", "Göteborg")),
-						new KeyValuePair<int, Person>( RandId, new Person(randId, "Abel Abrahamsson", "+00123456789", "Staden")),
-						new KeyValuePair<int, Person>( RandId, new Person(randId, "Bror Björn", "+5555555555", "Skogen")),
-						new KeyValuePair<int, Person>( RandId, new Person(randId, "Örjan Örn", "1111111111", "Luftslottet"))
-					}
-				);
+				list.postNames = Person.StringifyDisplayNames;
+				var data = new Dictionary<int, Person>();
+
+				AppendData(data, new Person[] {
+					new Person("Jens Eresund", "+46706845909", "Göteborg"),
+					new Person("Abel Abrahamsson", "+00123456789", "Staden"),
+					new Person("Bror Björn", "+5555555555", "Skogen"),
+					new Person("Örjan Örn", "1111111111", "Luftslottet")
+				});
+				list.data = data;
 				_virtualDatabases.Add(databaseId, list);
 			}
-
 			return list;
 		}
-
+		private static void AppendData(Dictionary<int, Person> database, Person[] people)
+		{
+			foreach(var person in people)
+			{
+				database.Add(person.Id, person);
+			}
+		}
 		public static bool AppendData(string _databaseId, Person person)
 		{
 			_databaseId = "dummyId";

@@ -2,7 +2,7 @@
 
 @{
 	ViewData["Title"] = "People List";
-	_ = Model.GetPerson.Value;
+	_ = Model.GetPerson;
 }
 
 <div id="peopleList" class="container">
@@ -16,7 +16,7 @@
 	</div>
 	@while(!Model.ListEnd)
 	{
-		<partial name="_person" model="Model.GetPerson.Value" />
+		<partial name="_person" model="Model.GetPerson" />
 	}
 </div>
 

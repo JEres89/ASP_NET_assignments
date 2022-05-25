@@ -1,6 +1,10 @@
 ﻿@model PeopleModel
 @{
 	ViewData["Title"] = "People";
+	if(ViewBag.addPersonResult == null)
+	{
+		ViewData["list"] = "style=\"display:none\"";
+	}
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -13,8 +17,10 @@
 		<input type="button" id="show_details" value="Details" />
 	</div>
 </div>
+
 <p id="message"></p>
-<div class="container" id="list_container" style="display:none">
+
+<div class="container" id="list_container" @Html.Raw(@ViewData["list"]) >
 	<form id="searchPerson">
 		<fieldset>
 			<legend>Find person</legend>
@@ -23,23 +29,10 @@
 			<input type="submit" id="searchSubmit" value="Find" />
 		</fieldset>
 	</form>
-
-	<form id="createPerson">
-		<fieldset>
-			<legend>Add person</legend>
-			<input type="hidden" name="formName" value="createPerson" />
-			<label for="createName">Full name</label>
-			<input type="text" id="createName" name="createName" placeholder="Firstname Lastname" />
-
-			<label for="createPhone">Phone number</label>
-			<input type="number" id="createPhone" name="createPhone" placeholder="0046709876543" />
-
-			<label for="createCity">City</label>
-			<input type="text" id="createCity" name="createCity" placeholder="Cityname" />
-
-			<input type="submit" id="createSubmit" value="Add Person" />
-		</fieldset>
-	</form>
+	<input type="button" id="newPerson" value="Add a new person" />
+	<div id="createView">
+		@ViewBag.addPersonResult
+	</div>
 
 	<div id="peopleView">
 		<partial name="_PeopleList" model="Model" />
@@ -66,8 +59,18 @@
 			$("#list_container").css("display", "none");
 			$("#details_container").css("display", "block");
 		});
-
-		$("form").on("submit", function (ev) {
+		$("#newPerson").on("click", function () {
+			$.ajax(
+				{
+					type: 'GET',
+					url: "/People/Create",
+					success: function (response) {
+						$("#createView").html(response);
+					}
+				})
+		});
+		
+		$("#searchPerson").on("submit", function (ev) {
 			ev.preventDefault();
 
 			let formData = new FormData(this);

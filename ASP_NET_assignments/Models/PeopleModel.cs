@@ -33,15 +33,15 @@ namespace ASP_NET_assignments.Models
 			get => listEnd;
 			private set => listEnd = value ;
 		}
-		public KeyValuePair<int, Person> GetPerson
+		public Person GetPerson
 		{
 			get
 			{
 				if(ListEnd)
 				{
-					return new KeyValuePair<int, Person>(0, new Person(0, String.Empty, String.Empty, String.Empty));
+					return null;
 				}
-				KeyValuePair<int, Person> person = E_people.Current;
+				Person person = E_people.Current.Value;
 				ListEnd = !E_people.MoveNext();
 
 				return person;
@@ -97,10 +97,14 @@ namespace ASP_NET_assignments.Models
 			ListEnd = false;
 		}
 
+		public void AddPerson(Person person)
+		{
+			VirtualDatabase.AppendData(_databaseId, person);
+			Reset();
+		}
 		public void AddPerson(IFormCollection formData)
 		{
 			Person person = new Person(
-				VirtualDatabase.RandId, 
 				formData["createName"],
 				formData["createPhone"],
 				formData["createCity"]

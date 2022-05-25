@@ -1,0 +1,22 @@
+﻿@model Models.Person
+@Html.AntiForgeryToken()
+@{
+	ViewData["Title"] = "";
+}
+
+<form asp-action="Create" method="post" id="createPerson" >
+	<fieldset>
+		<legend>Add person</legend>
+		<input type="hidden" name="formName" value="createPerson" />
+		<label asp-for="Name" class="control-label"></label>
+		<input asp-for="Name" id="createName" class="form-control" placeholder="Firstname Lastname" />
+
+		<label asp-for="Phonenumber" class="control-label"></label>
+		<input asp-for="Phonenumber" id="createPhone" placeholder="0046709876543" />
+
+		<label asp-for="City" class="control-label"></label>
+		<input asp-for="City" id="createCity" placeholder="Cityname" />
+
+		<input type="submit" id="createSubmit" value="Add Person" />
+	</fieldset>
+</form>
