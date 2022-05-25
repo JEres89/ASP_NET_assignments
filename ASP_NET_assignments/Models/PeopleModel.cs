@@ -10,11 +10,11 @@ namespace ASP_NET_assignments.Models
 		private static readonly Dictionary<string, PeopleModel> cache = new Dictionary<string, PeopleModel>();
 		private string _databaseId;
 		public string[] postNames;
-		private Dictionary<int, string[]> peopleData;
-		private readonly Dictionary<int, string[]> selectedPeopleData;
+		private Dictionary<int, Person> peopleData;
+		private readonly Dictionary<int, Person> selectedPeopleData;
 
-		private readonly SearchModel<Dictionary<int, string[]>, string[]> searchModel;
-		public Dictionary<int, string[]> PeopleData
+		private readonly SearchModel<Dictionary<int, Person>> searchModel;
+		public Dictionary<int, Person> PeopleData
 		{
 			get
 			{
@@ -26,22 +26,22 @@ namespace ASP_NET_assignments.Models
 			}
 			private set => peopleData =  value ;
 		}
-		private IEnumerator<KeyValuePair<int, string[]>> E_people;
+		private IEnumerator<KeyValuePair<int, Person>> E_people;
 		private bool listEnd = false;
 		public bool ListEnd
 		{
 			get => listEnd;
 			private set => listEnd = value ;
 		}
-		public KeyValuePair<int, string[]> GetPerson
+		public KeyValuePair<int, Person> GetPerson
 		{
 			get
 			{
 				if(ListEnd)
 				{
-					return new KeyValuePair<int, string[]>();
+					return new KeyValuePair<int, Person>(0, new Person(0, String.Empty, String.Empty, String.Empty));
 				}
-				KeyValuePair<int, string[]> person = E_people.Current;
+				KeyValuePair<int, Person> person = E_people.Current;
 				ListEnd = !E_people.MoveNext();
 
 				return person;
@@ -78,8 +78,8 @@ namespace ASP_NET_assignments.Models
 			var session = VirtualDatabase.GetDatabase(_databaseId);
 			postNames = session.postNames;
 			PeopleData = session.data;
-			Dictionary<int, string[]> searchCollection = new Dictionary<int, string[]>();
-			searchModel = new SearchModel<Dictionary<int, string[]>, string[]>(ref peopleData, searchCollection);
+			Dictionary<int, Person> searchCollection = new Dictionary<int, Person>();
+			searchModel = new SearchModel<Dictionary<int, Person>>(ref peopleData, searchCollection);
 			selectedPeopleData = searchCollection;
 			Reset();
 		}
@@ -99,13 +99,13 @@ namespace ASP_NET_assignments.Models
 
 		public void AddPerson(IFormCollection formData)
 		{
-			string[] data =
-			{
+			Person person = new Person(
+				VirtualDatabase.RandId, 
 				formData["createName"],
 				formData["createPhone"],
 				formData["createCity"]
-			};
-			VirtualDatabase.AppendData(_databaseId, data);
+			);
+			VirtualDatabase.AppendData(_databaseId, person);
 			Reset();
 		}
 		public bool RemovePerson(int id)

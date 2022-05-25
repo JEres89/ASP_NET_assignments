@@ -54,7 +54,7 @@ namespace ASP_NET_assignments.Controllers
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_person", model);
+			return PartialView("_person", model.GetPerson.Value);
 		}
 
 		public IActionResult Create(IFormCollection formData)

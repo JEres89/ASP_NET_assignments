@@ -5,36 +5,38 @@ namespace ASP_NET_assignments.Models
 {
 	public static class VirtualDatabase
 	{
-		private static Dictionary<string, (string[] postNames, Dictionary<int, string[]> data)> _virtualDatabases = new Dictionary<string, (string[], Dictionary<int, string[]>)>();
+		private static Dictionary<string, (string[] postNames, Dictionary<int, Person> data)> _virtualDatabases = new Dictionary<string, (string[], Dictionary<int, Person>)>();
 		private static readonly Random rand = new Random();
+
+		private static int randId;
 		public static int RandId
 		{
 			get
 			{
-				int nextRand = rand.Next();
-				while(usedIds.Contains(nextRand))
+				randId = rand.Next();
+				while(usedIds.Contains(randId))
 				{
-					nextRand = rand.Next();
+					randId = rand.Next();
 				}
-				usedIds.Add(nextRand);
-				return nextRand;
+				usedIds.Add(randId);
+				return randId;
 			}
 		}
 		private static List<int> usedIds = new List<int>();
-		public static (string[] postNames, Dictionary<int, string[]> data) GetDatabase(string databaseId)
+		public static (string[] postNames, Dictionary<int, Person> data) GetDatabase(string databaseId)
 		{
 			databaseId = "dummyId";
 			if(!_virtualDatabases.TryGetValue(databaseId, out var list))
 			{
 				list.postNames = new string[] { "Name", "Phonenumber", "City of Residence" };
-				list.data = new Dictionary<int, string[]>
+				list.data = new Dictionary<int, Person>
 				(
-					new KeyValuePair<int, string[]>[]
+					new KeyValuePair<int, Person>[]
 					{
-						new KeyValuePair<int, string[]>( RandId, new string[] { "Jens Eresund", "+46706845909", "Göteborg"}),
-						new KeyValuePair<int, string[]>( RandId, new string[] { "Abel Abrahamsson", "+00123456789", "Staden"}),
-						new KeyValuePair<int, string[]>( RandId, new string[] { "Bror Björn", "+5555555555", "Skogen"}),
-						new KeyValuePair<int, string[]>( RandId, new string[] { "Örjan Örn", "1111111111", "Luftslottet"})
+						new KeyValuePair<int, Person>( RandId, new Person(randId, "Jens Eresund", "+46706845909", "Göteborg")),
+						new KeyValuePair<int, Person>( RandId, new Person(randId, "Abel Abrahamsson", "+00123456789", "Staden")),
+						new KeyValuePair<int, Person>( RandId, new Person(randId, "Bror Björn", "+5555555555", "Skogen")),
+						new KeyValuePair<int, Person>( RandId, new Person(randId, "Örjan Örn", "1111111111", "Luftslottet"))
 					}
 				);
 				_virtualDatabases.Add(databaseId, list);
@@ -43,12 +45,12 @@ namespace ASP_NET_assignments.Models
 			return list;
 		}
 
-		public static bool AppendData(string _databaseId, string[] data)
+		public static bool AppendData(string _databaseId, Person person)
 		{
 			_databaseId = "dummyId";
 			if(_virtualDatabases.TryGetValue(_databaseId, out var list))
 			{
-				list.data.Add(RandId, data);
+				list.data.Add(person.Id, person);
 				//_virtualDatabases[_databaseId] = list;
 				return true;
 			}

@@ -112,7 +112,7 @@
 					url: "/People/Delete/" + id,
 					success: function (response) {
 						$("#" + id).remove();
-						$("#detailsView").html(response.responseJSON);
+						$("#detailsView").html(response);
 					},
 					error: function (response) {
 
@@ -120,21 +120,29 @@
 					}
 				});
 		});
-		//$("#peopleView").on("click", "[name='delete_row']", function ()
-		//{
-		//	let row = $(this).closest("tr");
-		//	let id = parseInt(row.prop("id").split(' ')[1]);
-		//	$.ajax(
-		//	{
-		//		type: 'POST',
-		//		url: "/People/Delete/" + id,
-		//		success: function (response) {
-		//			$("#peopleView").html(response);
-		//		},
-		//		error: function () {
+		$(document).on("click", "[name='delete_row']", function ()
+		{
+			let row = $(this).closest(".row");
 
-		//		}
-		//	});
-		//});
+			let id = parseInt(row.prop("id"));
+			$.ajax(
+				{
+					type: 'POST',
+					url: "/People/Delete/" + id,
+					success: function (response) {
+						if (row.parent().attr("id") == "detailsView") {
+							$("#" + id).remove();
+							$("#detailsView").html(response);
+						} else {
+							$("#message").html(response);
+							row.remove;
+						}
+						row.remove();
+					},
+					error: function () {
+
+					}
+				});
+		});
 	});
 </script>

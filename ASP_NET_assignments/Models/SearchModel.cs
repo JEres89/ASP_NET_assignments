@@ -5,44 +5,34 @@ using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
+
 namespace ASP_NET_assignments.Models
 {
-	/**
-	 * TODO:
-	 * Replace IList<string> (string[] in PeopleModel) with List< key : string > 
-	 * and int[] searchIndexes with List<key> searchKeys
-	 * to accomodate variable length database rows.
-	 */
-	public class SearchModel<T1, T2> where T1 : IDictionary<int, T2> where T2 : IList<string>
+	public class SearchModel<T1> where T1 : IDictionary<int, Person>
 	{
 		readonly T1 dataSet;
 		private int[] searchIndexes = {-1};
 		private string lastSearch;
 		T1 result;
-		public T1 Result
-		{
+		
+		public T1 Result {
 			get => result;
 
-			private set
-			{
+			private set {
 				HasSearched = true;
 				result = value;
 			}
 		}
-		public bool HasSearched
-		{
+		public bool HasSearched {
 			get; private set;
 		} = false;
-
-		// <searchValue, 
-		//Func<string, string, bool> GetValue;
 
 		public SearchModel(ref T1 data, T1 searchCollection)
 		{
 			dataSet = data;
 			result = searchCollection;
 		}
-		
+
 		public void SetSearchScope(int[] postIndex)
 		{
 			this.searchIndexes = postIndex;
@@ -77,10 +67,10 @@ namespace ASP_NET_assignments.Models
 				// cast error från compilern och den föreslår (T1) cast som lösning (??)
 
 				// Result = (T1)dataSet.Where(row => row.Any(post => post.Contains(value)));
-				
+
 				foreach(var row in dataSet)
 				{
-					if(row.Value.Any(post => post.Contains(value)))
+					if(row.Value.StringifyValues.Any(post => post.Contains(value)))
 					{
 						result.Add(row);
 					}
@@ -99,13 +89,13 @@ namespace ASP_NET_assignments.Models
 				{
 					foreach(int i in searchIndexes)
 					{
-						if(row.Value[i].Contains(value))
+						if(row.Value.StringifyValues[i].Contains(value))
 						{
 							result.Add(row);
 							break;
 						}
 					}
-					
+
 				}
 			}
 			else
@@ -114,7 +104,7 @@ namespace ASP_NET_assignments.Models
 
 				foreach(var row in dataSet)
 				{
-					if(row.Value[searchIndexes[0]].Contains(value))
+					if(row.Value.StringifyValues[searchIndexes[0]].Contains(value))
 					{
 						result.Add(row);
 					}
