@@ -3,19 +3,17 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_NET_assignments.Models
 {
-	[Table("PeopleDataTable")]
 	[BindProperties]
 	public class Person
 	{
-
+		private readonly int id;
 		[Display(Name = "Person ID")]
 		[Key]
 		[Editable(false)]
-		public int Id { get; set; }
+		public int Id { get => id; }
 
 		[Display(Name ="Full name")]
 		[Required]
@@ -54,11 +52,11 @@ namespace ASP_NET_assignments.Models
 
 		public Person()
 		{
-			Id = VirtualDatabase.RandId;
+			id = VirtualDatabase.RandId;
 		}
 		private Person(int id, string name, string phonenumber, string city)
 		{
-			Id = id;
+			this.id = id;
 			Name = name;
 			Phonenumber = phonenumber;
 			City = city;
