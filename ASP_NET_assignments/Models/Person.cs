@@ -9,13 +9,13 @@ namespace ASP_NET_assignments.Models
 	[BindProperties]
 	public class Person
 	{
-		private readonly int id;
+
 		[Display(Name = "Person ID")]
 		[Key]
 		[Editable(false)]
-		public int Id { get => id; }
+		public int Id { get; set; }
 
-		[Display(Name ="Full name")]
+		[Display(Name = "Full name")]
 		[Required]
 		public string Name {
 			get; set;
@@ -39,7 +39,7 @@ namespace ASP_NET_assignments.Models
 				return new string[] { Id.ToString(), Name, Phonenumber, City };
 			}
 		}
-		
+
 		public static string[] StringifyNames = new string[] {
 			"Id", "Name", "Phonenumber", "City" };
 		public static string[] StringifyDisplayNames = new string[] {
@@ -52,11 +52,11 @@ namespace ASP_NET_assignments.Models
 
 		public Person()
 		{
-			id = VirtualDatabase.RandId;
+			Id = VirtualDatabase.RandId;
 		}
 		private Person(int id, string name, string phonenumber, string city)
 		{
-			this.id = id;
+			Id = id;
 			Name = name;
 			Phonenumber = phonenumber;
 			City = city;
