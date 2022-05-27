@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP_NET_assignments.Models
 {
+	[Table("PeopleDataTable")]
 	[BindProperties]
 	public class Person
 	{
