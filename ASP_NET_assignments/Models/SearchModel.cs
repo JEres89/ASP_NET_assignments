@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -8,34 +9,28 @@ using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
-	public class SearchModel<T1> where T1 : IDictionary<int, Person>
+	public class SearchModel<T1, T2> where T1 : DbSet<T2> where T2 : class, I_DBformData
 	{
 		readonly T1 dataSet;
-		private int[] searchIndexes = {-1};
+		private int[] searchPosts = new int[0];
 		private string lastSearch;
-		T1 result;
+		List<T2> result = new List<T2>();
 		
-		public T1 Result {
+		public List<T2> Result {
 			get => result;
-
-			private set {
-				HasSearched = true;
-				result = value;
-			}
 		}
 		public bool HasSearched {
 			get; private set;
 		} = false;
 
-		public SearchModel(ref T1 data, T1 searchCollection)
+		public SearchModel(ref T1 data)
 		{
 			dataSet = data;
-			result = searchCollection;
 		}
 
-		public void SetSearchScope(int[] postIndex)
+		public void SetSearchScope(int[] postIndexes)
 		{
-			this.searchIndexes = postIndex;
+			this.searchPosts = postIndexes;
 		}
 		public void ClearSearch()
 		{
@@ -47,69 +42,50 @@ namespace ASP_NET_assignments.Models
 		/**
 		 * Call if #Collection is changed (added/removeded value).
 		 */
-		public void RenewSearch()
+		public bool RenewSearch()
 		{
-			if(HasSearched)
-			{
-				Search(lastSearch);
-			}
+			return Search(lastSearch);
 		}
 
-		public void Search(string value)
+		public bool Search(string value)
 		{
-			lastSearch = value;
-			HasSearched = true;
 			result.Clear();
 
-			if(searchIndexes[0] < 0)
+			if(value == null)
 			{
-				// Detta ger ett mystiskt cast error i runtime, men utan (T1) blir det implicit 
-				// cast error från compilern och den föreslår (T1) cast som lösning (??)
-
-				// Result = (T1)dataSet.Where(row => row.Any(post => post.Contains(value)));
-
-				foreach(var row in dataSet)
-				{
-					if(row.Value.StringifyValues.Any(post => post.Contains(value)))
-					{
-						result.Add(row);
-					}
-				}
+				HasSearched = false;
+				return false;
 			}
-			else if(searchIndexes.Length > 1)
-			{
-				//Result = (T1)dataSet.Where(row => 
-				//	{
-				//		foreach(int i in searchIndexes) { 
-				//			if(row[i].Contains(value)) { return true; } }
-				//		return false;
-				//	});
 
+			lastSearch = value;
+			HasSearched = true;
+
+			if(searchPosts.Length < 1)
+			{
+				result = dataSet.ToList().Where(row => row.StringifyValues.Any(post => post.Contains(value))).ToList();
+			}
+			else if(searchPosts.Length > 1)
+			{
 				foreach(var row in dataSet)
 				{
-					foreach(int i in searchIndexes)
+					foreach(int p in searchPosts)
 					{
-						if(row.Value.StringifyValues[i].Contains(value))
-						{
-							result.Add(row);
-							break;
-						}
+						if(row.StringifyValues[p].Contains(value))
+						{ result.Add(row); break; }
 					}
-
 				}
 			}
 			else
 			{
-				//Result = (T1)dataSet.Where(row => row[searchIndexes[0]].Contains(value));
-
 				foreach(var row in dataSet)
 				{
-					if(row.Value.StringifyValues[searchIndexes[0]].Contains(value))
+					if(row.StringifyValues[searchPosts[0]].Contains(value))
 					{
 						result.Add(row);
 					}
 				}
 			}
+			return true;
 		}
 	}
 }

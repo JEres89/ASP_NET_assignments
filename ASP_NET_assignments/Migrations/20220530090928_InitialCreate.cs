@@ -2,7 +2,7 @@
 
 namespace ASP_NET_assignments.Migrations
 {
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -19,6 +19,17 @@ namespace ASP_NET_assignments.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PeopleDataTable", x => x.Id);
+                });
+
+            migrationBuilder.InsertData(
+                table: "PeopleDataTable",
+                columns: new[] { "Id", "City", "Name", "Phonenumber" },
+                values: new object[,]
+                {
+                    { 399444226, "Göteborg", "Jens Eresund", "+46706845909" },
+                    { 523178533, "Staden", "Abel Abrahamsson", "+00123456789" },
+                    { 1591867130, "Skogen", "Bror Björn", "+5555555555" },
+                    { 312203518, "Luftslottet", "Örjan Örn", "1111111111" }
                 });
         }
 

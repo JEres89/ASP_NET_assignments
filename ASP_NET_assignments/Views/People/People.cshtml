@@ -3,7 +3,7 @@
 	ViewData["Title"] = "People";
 	if(ViewBag.addPersonResult == null)
 	{
-		ViewData["list"] = "style=\"display:none\"";
+		ViewData["listDisplay"] = "style=\"display:none\"";
 	}
 }
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -20,7 +20,7 @@
 
 <p id="message"></p>
 
-<div class="container" id="list_container" @Html.Raw(@ViewData["list"]) >
+<div class="container" id="list_container" @Html.Raw(@ViewData["listDisplay"]) >
 	<form id="searchPerson">
 		<fieldset>
 			<legend>Find person</legend>
@@ -72,15 +72,12 @@
 		
 		$("#searchPerson").on("submit", function (ev) {
 			ev.preventDefault();
-
-			let formData = new FormData(this);
+			let searchValue = $("#searchValue").val();
 			$.ajax(
 				{
 					type: 'POST',
-					url: "/People/FormSubmit",
-					contentType: false,
-					processData: false,
-					data: formData,
+					url: "/People/Search",
+					data: searchValue,
 					success: function (response) {
 
 						$("#peopleView").html(response);

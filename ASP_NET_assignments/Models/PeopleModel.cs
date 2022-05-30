@@ -1,32 +1,38 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ASP_NET_assignments.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
 
 namespace ASP_NET_assignments.Models
 {
 	public class PeopleModel 
 	{
-		private static readonly Dictionary<string, PeopleModel> cache = new Dictionary<string, PeopleModel>();
-		private string _databaseId;
-		public string[] postNames;
-		private Dictionary<int, Person> peopleData;
-		private readonly Dictionary<int, Person> selectedPeopleData;
+		private static PeopleModel cache;
 
-		private readonly SearchModel<Dictionary<int, Person>> searchModel;
-		public Dictionary<int, Person> PeopleData
-		{
-			get
-			{
-				if(searchModel.HasSearched)
-				{
-					return selectedPeopleData;
-				}
-				return peopleData;
-			}
-			private set => peopleData =  value ;
-		}
-		private IEnumerator<KeyValuePair<int, Person>> E_people;
+		private AppDbContext _database;
+		public string[] postNames;
+		private DbSet<Person> peopleData;
+		private readonly List<Person> selectedPeopleData;
+
+		private readonly SearchModel<DbSet<Person>, Person> searchModel;
+		//public Dictionary<int, Person> PeopleData
+		//{
+		//	get
+		//	{
+		//		if(searchModel.HasSearched)
+		//		{
+		//			return selectedPeopleData;
+		//		}
+		//		return peopleData;
+		//	}
+		//	private set => peopleData =  value ;
+		//}
+		private IEnumerator<Person> E_people;
 		private bool listEnd = false;
 		public bool ListEnd
 		{
@@ -41,7 +47,7 @@ namespace ASP_NET_assignments.Models
 				{
 					return null;
 				}
-				Person person = E_people.Current.Value;
+				Person person = E_people.Current;
 				ListEnd = !E_people.MoveNext();
 
 				return person;
@@ -50,7 +56,7 @@ namespace ASP_NET_assignments.Models
 		public bool SetPerson(int id)
 		{
 			Reset();
-			while(E_people.Current.Key != id)
+			while(E_people.Current.Id != id)
 			{
 				if(!E_people.MoveNext())
 				{
@@ -61,62 +67,74 @@ namespace ASP_NET_assignments.Models
 			return true;
 		}
 
-		public static PeopleModel GetSessionModel(string sessionId)
+		public static PeopleModel GetSessionModel(AppDbContext dbContext)
 		{
-			sessionId = "dummyId";
-			if(!cache.TryGetValue(sessionId, out PeopleModel model))
+			if(cache == null)
 			{
-				model = new PeopleModel(sessionId);
-				cache.Add(sessionId, model);
-				return model;
+				cache = new PeopleModel(dbContext);
 			}
-			return model;
-		}
-		private PeopleModel(string databaseId)
-		{
-			_databaseId = databaseId;
-			var session = VirtualDatabase.GetDatabase(_databaseId);
-			postNames = session.postNames;
-			PeopleData = session.data;
-			Dictionary<int, Person> searchCollection = new Dictionary<int, Person>();
-			searchModel = new SearchModel<Dictionary<int, Person>>(ref peopleData, searchCollection);
-			selectedPeopleData = searchCollection;
-			Reset();
+			else
+			{
+				cache._database = dbContext;
+				cache.peopleData = cache._database.People;
+				cache.Refresh();
+			}
+			return cache;
 		}
 
+		public  PeopleModel(AppDbContext dbContext)
+		{
+			_database = dbContext;
+			//var session = VirtualDatabase.GetDatabase(_databaseId);
+			//postNames = session.postNames;
+			//PeopleData = session.data;
+			//Dictionary<int, Person> searchCollection = new Dictionary<int, Person>();
+			peopleData = _database.People;
+			_database.SaveChanges();
+			
+			searchModel = new SearchModel<DbSet<Person>, Person>(ref peopleData);
+			selectedPeopleData = searchModel.Result;
+			Reset();
+		}
+		private void Refresh()
+		{
+			if(searchModel.RenewSearch())
+			{
+				E_people = selectedPeopleData.GetEnumerator();
+				ListEnd = false;
+			}
+			else
+			{
+				Reset();
+			}
+		}
 		public void Reset()
 		{
-			searchModel.ClearSearch();
-			E_people = peopleData.GetEnumerator();
+			E_people = peopleData.AsEnumerable().GetEnumerator();
 			ListEnd = false;
 		}
 		public void Search(string value)
 		{
-			searchModel.Search(value);
-			E_people = selectedPeopleData.GetEnumerator();
+			if(searchModel.Search(value))
+			{
+				E_people = selectedPeopleData.GetEnumerator();
+			}
 			ListEnd = false;
 		}
 
 		public void AddPerson(Person person)
 		{
-			VirtualDatabase.AppendData(_databaseId, person);
-			Reset();
+			_database.People.Add(person);
+			_database.SaveChanges();
+			Refresh();
 		}
-		public void AddPerson(IFormCollection formData)
-		{
-			Person person = new Person(
-				formData["createName"],
-				formData["createPhone"],
-				formData["createCity"]
-			);
-			VirtualDatabase.AppendData(_databaseId, person);
-			Reset();
-		}
+
 		public bool RemovePerson(int id)
 		{
-			bool success = VirtualDatabase.RemoveData(_databaseId, id);
-			Reset();
-			return success;
+			var success = _database.People.Remove(_database.People.Find(id));
+			_database.SaveChanges();
+			Refresh();
+			return success.Entity == null;
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace ASP_NET_assignments.Models
 			databaseId = "dummyId";
 			if(!_virtualDatabases.TryGetValue(databaseId, out var list))
 			{
-				list.postNames = Person.StringifyDisplayNames;
+				list.postNames = Person.stringifyDisplayNames;
 				var data = new Dictionary<int, Person>();
 
 				AppendData(data, new Person[] {
@@ -39,6 +39,7 @@ namespace ASP_NET_assignments.Models
 				});
 				list.data = data;
 				_virtualDatabases.Add(databaseId, list);
+
 			}
 			return list;
 		}

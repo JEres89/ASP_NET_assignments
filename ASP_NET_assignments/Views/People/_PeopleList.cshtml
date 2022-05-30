@@ -7,10 +7,10 @@
 
 <div id="peopleList" class="container">
 	<div class="row" id="columnNames">
-		@for(int i = 0 ; i < Person.StringifyNames.Length ; i++)
+		@for(int i = 0 ; i < Person.stringifyNames.Length ; i++)
 		{
-			<div class="col @Person.StringifyNames[i]">
-				@Person.StringifyDisplayNames[i]
+			<div class="col @Person.stringifyNames[i]">
+				@Person.stringifyDisplayNames[i]
 			</div>
 		}
 		<div class="col">Remove</div>

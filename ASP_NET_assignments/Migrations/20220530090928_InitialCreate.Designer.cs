@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASP_NET_assignments.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220527084205_Initial")]
-    partial class Initial
+    [Migration("20220530090928_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,36 @@ namespace ASP_NET_assignments.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PeopleDataTable");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 399444226,
+                            City = "Göteborg",
+                            Name = "Jens Eresund",
+                            Phonenumber = "+46706845909"
+                        },
+                        new
+                        {
+                            Id = 523178533,
+                            City = "Staden",
+                            Name = "Abel Abrahamsson",
+                            Phonenumber = "+00123456789"
+                        },
+                        new
+                        {
+                            Id = 1591867130,
+                            City = "Skogen",
+                            Name = "Bror Björn",
+                            Phonenumber = "+5555555555"
+                        },
+                        new
+                        {
+                            Id = 312203518,
+                            City = "Luftslottet",
+                            Name = "Örjan Örn",
+                            Phonenumber = "1111111111"
+                        });
                 });
 #pragma warning restore 612, 618
         }

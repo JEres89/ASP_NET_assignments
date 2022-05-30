@@ -9,7 +9,7 @@ namespace ASP_NET_assignments.Models
 {
 	[Table("PeopleDataTable")]
 	[BindProperties]
-	public class Person
+	public class Person : I_DBformData
 	{
 
 		[Display(Name = "Person ID")]
@@ -42,19 +42,17 @@ namespace ASP_NET_assignments.Models
 			}
 		}
 
-		public static string[] StringifyNames = new string[] {
+		public static string[] stringifyNames { get; } = new string[] {
 			"Id", "Name", "Phonenumber", "City" };
-		public static string[] StringifyDisplayNames = new string[] {
+		public string[] StringifyNames { get => stringifyNames; }
+
+		public static string[] stringifyDisplayNames { get; } = new string[] {
 			"Person ID", "Full name", "Phone number", "City of Residence" };
-		//Array.ConvertAll(
-		//(DisplayAttribute[])Attribute.GetCustomAttributes(
-		//	Assembly.GetAssembly(Type.GetType("ASP_NET_assignments.Models.Person")), 
-		//	typeof (DisplayAttribute)), 
-		//attribute =>  attribute.Name );
+		public string[] StringifyDisplayNames { get => stringifyDisplayNames; }
 
 		public Person()
 		{
-			Id = VirtualDatabase.RandId;
+			//Id = VirtualDatabase.RandId;
 		}
 		private Person(int id, string name, string phonenumber, string city)
 		{
