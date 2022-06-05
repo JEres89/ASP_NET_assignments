@@ -1,48 +1,38 @@
 ﻿using ASP_NET_assignments.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 
 namespace ASP_NET_assignments.Models
 {
-	public class PeopleModel 
+	public class PeopleModel : I_DataViewModel <Person>
 	{
-		private static PeopleModel cache;
-
+		//private static PeopleModel cache;
 		private AppDbContext _database;
-		public string[] postNames;
+		private string[] postNames;
 		private DbSet<Person> peopleData;
 		private readonly List<Person> selectedPeopleData;
-
 		private readonly SearchModel<DbSet<Person>, Person> searchModel;
-		//public Dictionary<int, Person> PeopleData
-		//{
-		//	get
-		//	{
-		//		if(searchModel.HasSearched)
-		//		{
-		//			return selectedPeopleData;
-		//		}
-		//		return peopleData;
-		//	}
-		//	private set => peopleData =  value ;
-		//}
 		private IEnumerator<Person> E_people;
 		private bool listEnd = false;
-		public bool ListEnd
-		{
-			get => listEnd;
-			private set => listEnd = value ;
+		public List<Person> PeopleData {
+			get {
+				if(searchModel.HasSearched)
+				{
+					return selectedPeopleData;
+				}
+				return peopleData.ToList();
+			}
 		}
-		public Person GetPerson
-		{
-			get
-			{
+		public string[] PostNames { get => postNames; set => postNames =  value ; }
+
+		public bool ListEnd {
+			get => listEnd;
+			private set => listEnd = value;
+		}
+		public Person GetItem {
+			get {
 				if(ListEnd)
 				{
 					return null;
@@ -53,36 +43,37 @@ namespace ASP_NET_assignments.Models
 				return person;
 			}
 		}
-		public bool SetPerson(int id)
+
+		public bool SetNextItem(int id)
 		{
 			Reset();
-			while(E_people.Current.Id != id)
+			while(E_people.MoveNext())
 			{
-				if(!E_people.MoveNext())
+				if(E_people.Current.Id == id)
 				{
-					Reset();
-					return false;
+					return true;
 				}
 			}
-			return true;
+			Reset();
+			return false;
 		}
 
-		public static PeopleModel GetSessionModel(AppDbContext dbContext)
-		{
-			if(cache == null)
-			{
-				cache = new PeopleModel(dbContext);
-			}
-			else
-			{
-				cache._database = dbContext;
-				cache.peopleData = cache._database.People;
-				cache.Refresh();
-			}
-			return cache;
-		}
+		//public static PeopleModel GetSessionModel(AppDbContext dbContext)
+		//{
+		//	if(cache == null)
+		//	{
+		//		cache = new PeopleModel(dbContext);
+		//	}
+		//	else
+		//	{
+		//		cache._database = dbContext;
+		//		cache.peopleData = cache._database.People;
+		//		cache.Refresh();
+		//	}
+		//	return cache;
+		//}
 
-		public  PeopleModel(AppDbContext dbContext)
+		public PeopleModel(AppDbContext dbContext)
 		{
 			_database = dbContext;
 			//var session = VirtualDatabase.GetDatabase(_databaseId);
@@ -90,8 +81,6 @@ namespace ASP_NET_assignments.Models
 			//PeopleData = session.data;
 			//Dictionary<int, Person> searchCollection = new Dictionary<int, Person>();
 			peopleData = _database.People;
-			_database.SaveChanges();
-			
 			searchModel = new SearchModel<DbSet<Person>, Person>(ref peopleData);
 			selectedPeopleData = searchModel.Result;
 			Reset();
@@ -108,7 +97,7 @@ namespace ASP_NET_assignments.Models
 				Reset();
 			}
 		}
-		public void Reset()
+		private void Reset()
 		{
 			E_people = peopleData.AsEnumerable().GetEnumerator();
 			ListEnd = false;
@@ -119,17 +108,21 @@ namespace ASP_NET_assignments.Models
 			{
 				E_people = selectedPeopleData.GetEnumerator();
 			}
+			else
+			{
+				Reset();
+			}
 			ListEnd = false;
 		}
 
-		public void AddPerson(Person person)
+		public void AddItem(Person person)
 		{
 			_database.People.Add(person);
 			_database.SaveChanges();
 			Refresh();
 		}
 
-		public bool RemovePerson(int id)
+		public bool RemoveItem(int id)
 		{
 			var success = _database.People.Remove(_database.People.Find(id));
 			_database.SaveChanges();

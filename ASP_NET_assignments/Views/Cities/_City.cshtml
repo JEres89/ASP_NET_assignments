@@ -1,0 +1,18 @@
+﻿@model City
+
+@{
+}
+
+<div id="@Model.Id" class="row itemRow">
+	<div class="col @Html.NameFor(model => model.Id)">
+		@Model.Id
+	</div>
+	<div class="col @Html.NameFor(model => model.Name)">
+		@Model.Name
+	</div>
+	<div class="col @Html.NameFor(model => model.People)">
+		@Model.StringifyValues[2]
+	</div>
+
+	<div class="col removeEntitybtn"><button class="removeEntitybtn" name="delete_row" value="Remove"></button></div>
+</div>

@@ -1,0 +1,30 @@
+﻿@model Models.Person
+@Html.AntiForgeryToken()
+@{
+}
+
+<form asp-action="Create">
+	<fieldset class="row">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<legend>Add Person</legend>
+		<label asp-for="Name" class="control-label"></label>
+		<input asp-for="Name" id="Name" class="form-control" placeholder="Firstname Lastname" />
+		<span asp-validation-for="Name" class="text-danger"></span>
+
+		<label asp-for="Phonenumber" class="control-label"></label>
+		<input asp-for="Phonenumber" id="Phonenumber" class="form-control" placeholder="0046709876543" />
+		<span asp-validation-for="Phonenumber" class="text-danger"></span>
+
+		<label asp-for="CityName" class="control-label"></label>
+		<select asp-for="CityName" asp-items="@ViewBag.CityOptions" id="CityName" class="form-control">
+			<option disabled selected>--- SELECT ---</option>
+		</select>
+		<span asp-validation-for="CityName" class="text-danger"></span>
+
+		<input type="submit" id="create_submit" value="Add Person" />
+	</fieldset>
+</form>
+
+@{
+	await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}

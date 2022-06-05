@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
-	public class SearchModel<T1, T2> where T1 : DbSet<T2> where T2 : class, I_DBformData
+	public class SearchModel<T1, T2> where T1 : DbSet<T2> where T2 : I_DbDataModel<T2>
 	{
 		readonly T1 dataSet;
 		private int[] searchPosts = new int[0];
@@ -62,29 +63,61 @@ namespace ASP_NET_assignments.Models
 
 			if(searchPosts.Length < 1)
 			{
-				result = dataSet.ToList().Where(row => row.StringifyValues.Any(post => post.Contains(value))).ToList();
+
+				string[] columnNames = I_DbDataModel<T2>.StringifyNames;
+				string filters = string.Empty;
+				SqlParameter sqlParameter = new SqlParameter("value", value);
+
+				for(int i = 0 ; i < columnNames.Length ; i++)
+				{
+					string columnName = columnNames[i];
+
+					if(filters != string.Empty) {
+						filters += " OR ";
+					}
+					filters += $"{columnName} LIKE '%@value%'";
+				}
+
+				string query = $"SELECT * FROM {nameof(T2)} WHERE {filters}";
+
+				result = dataSet.FromSqlRaw(query, sqlParameter).ToList();
+
+				//result = I_DbDataModel<T2>.Search(dataSet, value).ToList();
+				//result = dataSet.Where(row => row.StringifyValues.Any(post => post.Contains(value))).ToList();
 			}
 			else if(searchPosts.Length > 1)
 			{
-				foreach(var row in dataSet)
+				string[] columnNames = I_DbDataModel<T2>.StringifyNames;
+				string filters = string.Empty;
+				SqlParameter sqlParameter = new SqlParameter("value", value);
+
+				for(int i = 0 ; i < searchPosts.Length ; i++)
 				{
-					foreach(int p in searchPosts)
+					int column = searchPosts[i];
+					string columnName = columnNames[column];
+
+					if(filters != string.Empty)
 					{
-						if(row.StringifyValues[p].Contains(value))
-						{ result.Add(row); break; }
+						filters += " OR ";
 					}
+					filters += $"{columnName} LIKE '%@value%'";
 				}
+
+				string query = $"SELECT * FROM {nameof(T2)} WHERE {filters}";
+
+				result = dataSet.FromSqlRaw(query, sqlParameter).ToList();
+
 			}
-			else
-			{
-				foreach(var row in dataSet)
-				{
-					if(row.StringifyValues[searchPosts[0]].Contains(value))
-					{
-						result.Add(row);
-					}
-				}
-			}
+			//else
+			//{
+			//	foreach(var row in dataSet)
+			//	{
+			//		if(row.StringifyValues[searchPosts[0]].Contains(value))
+			//		{
+			//			result.Add(row);
+			//		}
+			//	}
+			//}
 			return true;
 		}
 	}

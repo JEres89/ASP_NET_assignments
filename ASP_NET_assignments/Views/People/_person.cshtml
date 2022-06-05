@@ -1,10 +1,9 @@
 ﻿@model Person
 
 @{
-	ViewData["Title"] = "";
 }
 
-<div id="@Model.Id" class="row">
+<div id="@Model.Id" class="row itemRow">
 	<div class="col @Html.NameFor(model => model.Id)">
 		@Model.Id
 	</div>
@@ -14,9 +13,9 @@
 	<div class="col @Html.NameFor(model => model.Phonenumber)">
 		@Model.Phonenumber
 	</div>
-	<div class="col @Html.NameFor(model => model.City)">
-		@Model.City
+	<div class="col @Html.NameFor(model => model.CityName)">
+		@Model.CityName
 	</div>
 
-	<div class="col"><button name="delete_row">Remove</button></div>
+	<div class="col removeEntitybtn"><button class="removeEntitybtn" name="delete_row" value="Remove"></button></div>
 </div>

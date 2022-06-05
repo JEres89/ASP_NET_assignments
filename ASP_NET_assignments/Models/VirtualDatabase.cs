@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
 	public static class VirtualDatabase
 	{
-		private static Dictionary<string, (string[] postNames, Dictionary<int, Person> data)> _virtualDatabases = new Dictionary<string, (string[], Dictionary<int, Person>)>();
 		private static readonly Random rand = new Random();
 
 		private static int randId;
@@ -23,52 +23,36 @@ namespace ASP_NET_assignments.Models
 			}
 		}
 		private static List<int> usedIds = new List<int>();
-		public static (string[] postNames, Dictionary<int, Person> data) GetDatabase(string databaseId)
+
+		public static List<T> GetSeedData<T>(T type) where T : I_DbDataModel<T>
 		{
-			databaseId = "dummyId";
-			if(!_virtualDatabases.TryGetValue(databaseId, out var list))
+			List<T> list = new List<T>();
+			switch(type)
 			{
-				list.postNames = Person.stringifyDisplayNames;
-				var data = new Dictionary<int, Person>();
+				case Person _:
+					list.AddRange( new T[] {
+						type.MakeInstance(new string[]{"Jens Eresund", "+46706845909", "Göteborg" }),
+						type.MakeInstance(new string[]{"Abel Abrahamsson", "+00123456789", "Staden" }),
+						type.MakeInstance(new string[]{"Bror Björn", "+5555555555", "Skogen" }),
+						type.MakeInstance(new string[]{"Örjan Örn", "1111111111", "Luftslottet" })
+					});
+					break;
+				case City _:
+					list.AddRange( new T[] {
+						type.MakeInstance(new string[]{"Göteborg" }),
+						type.MakeInstance(new string[]{"Staden" }),
+						type.MakeInstance(new string[]{"Skogen" }),
+						type.MakeInstance(new string[]{"Luftslottet" })
+					});
+					break;
+				case "Country":
 
-				AppendData(data, new Person[] {
-					new Person("Jens Eresund", "+46706845909", "Göteborg"),
-					new Person("Abel Abrahamsson", "+00123456789", "Staden"),
-					new Person("Bror Björn", "+5555555555", "Skogen"),
-					new Person("Örjan Örn", "1111111111", "Luftslottet")
-				});
-				list.data = data;
-				_virtualDatabases.Add(databaseId, list);
-
+					break;
+				default:
+					break;
 			}
+			
 			return list;
-		}
-		private static void AppendData(Dictionary<int, Person> database, Person[] people)
-		{
-			foreach(var person in people)
-			{
-				database.Add(person.Id, person);
-			}
-		}
-		public static bool AppendData(string _databaseId, Person person)
-		{
-			_databaseId = "dummyId";
-			if(_virtualDatabases.TryGetValue(_databaseId, out var list))
-			{
-				list.data.Add(person.Id, person);
-				//_virtualDatabases[_databaseId] = list;
-				return true;
-			}
-
-			return false;
-		}
-		public static bool RemoveData(string _databaseId, int rowId)
-		{
-			if(_virtualDatabases.TryGetValue(_databaseId, out var list))
-			{
-				return list.data.Remove(rowId);
-			}
-			return false;
 		}
 	}
 }

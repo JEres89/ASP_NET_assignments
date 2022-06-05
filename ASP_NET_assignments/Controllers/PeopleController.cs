@@ -3,10 +3,12 @@ using ASP_NET_assignments.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Net.Http;
 using System.Web;
 
@@ -39,13 +41,18 @@ namespace ASP_NET_assignments.Controllers
 		public IActionResult Details(int id)
 		{
 			PeopleModel model = new PeopleModel(dbContext);
-			if(id == 0 || !model.SetPerson(id))
+			if(id == 0 || !model.SetNextItem(id))
 			{
 				var json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_person", model.GetPerson);
+			return PartialView("_person", model.GetItem);
+		}
+		public IActionResult Create()
+		{
+			ViewBag.CityOptions = new SelectList(dbContext.Cities, "Name" ,"Name");
+			return PartialView("_CreatePerson");
 		}
 		[ValidateAntiForgeryToken]
 		[HttpPost]
@@ -54,38 +61,41 @@ namespace ASP_NET_assignments.Controllers
 			PeopleModel model = new PeopleModel(dbContext);
 			if(ModelState.IsValid)
 			{
-				model.AddPerson(person);
+				model.AddItem(person);
 				ViewBag.addPersonResult = "<p>Successfully added the new person</p>";
+				return View("People", model);
 			}
 			else
 			{
 				ViewBag.addPersonResult = "<p>Incorrect form data</p>";
+				return PartialView("_CreatePerson", person);
 			}
-			return View("People", model);
+			//return View("People", model);
 		}
 		[HttpGet]
-		public IActionResult Create()
-		{
-			return PartialView("CreatePersonView");
-		}
 		[HttpPost]
-		public IActionResult Delete(int id)
+		public IActionResult Delete(int? id)
 		{
-			PeopleModel model = new PeopleModel(dbContext);
-			if(model.RemovePerson(id))
+			JsonResult json;
+			if (id != null)
 			{
-				var json = Json($"<p>Person with ID {id} has been removed from the database.</p>");
-				json.StatusCode = 200;
-				return json;
+				PeopleModel model = new PeopleModel(dbContext);
+				if(model.RemoveItem(id.Value))
+				{
+					json = Json($"<p>Person with ID {id} has been removed from the database.</p>");
+					json.StatusCode = 200;
+				}
+				else
+				{
+					json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
+					json.StatusCode = 404;
+				}
 			}
 			else
 			{
-				var json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
-				json.StatusCode = 404;
-				return json;
+				json = new JsonResult(null);
 			}
-			
+			return json;
 		}
-
 	}
 }

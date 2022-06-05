@@ -6,143 +6,51 @@
 		ViewData["listDisplay"] = "style=\"display:none\"";
 	}
 }
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
-<h1>People Index</h1>
-<div class="row">
-	<div class="col-2">
-		<input type="button" id="show_list" value="List people" />
+<div class="container" id="People_view" style="height: 600px;">
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+	<h1>People Index</h1>
+	<div class="row">
+		<div class="col-2">
+			<input type="button" id="show_list" value="List People" />
+		</div>
+		<div class="col-2">
+			<input type="button" id="show_details" value="Details" />
+		</div>
+		<div class="col-2">
+			<input type="button" id="new_entry" value="Add a new Person" />
+		</div>
 	</div>
-	<div class="col-2">
-		<input type="button" id="show_details" value="Details" />
+
+	<p id="message"></p>
+
+	<div class="container" id="details_container" style="display:none">
+		<input type="number" id="id_text" placeholder="Person ID" />
+		<input type="button" id="get_details" value="Show" />
+		<input type="button" id="remove_row" value="Delete" />
+
+		<div id="details_view">
+		</div>
 	</div>
+
+	<div id="create_view">
+		@Html.Raw(ViewBag.addPersonResult)
+	</div>
+	<div class="container" id="list_container" @Html.Raw(@ViewData["listDisplay"])>
+		<form id="search_entries">
+			<fieldset>
+				<legend>Find Person</legend>
+				<input type="hidden" name="formName" value="search_person" />
+				<input type="text" id="search_value" placeholder="Search" />
+				<input type="submit" id="search_submit" value="Find" />
+			</fieldset>
+		</form>
+
+		<div id="list_view">
+			<partial name="_PeopleList" model="@Model" />
+		</div>
+	</div>
+
+	<script src="~/Scripts/ListView_scripts.js"></script>
 </div>
-
-<p id="message"></p>
-
-<div class="container" id="list_container" @Html.Raw(@ViewData["listDisplay"]) >
-	<form id="searchPerson">
-		<fieldset>
-			<legend>Find person</legend>
-			<input type="hidden" name="formName" value="searchPerson" />
-			<input type="text" id="searchValue" name="searchValue" placeholder="Search" />
-			<input type="submit" id="searchSubmit" value="Find" />
-		</fieldset>
-	</form>
-	<input type="button" id="newPerson" value="Add a new person" />
-	<div id="createView">
-		@ViewBag.addPersonResult
-	</div>
-
-	<div id="peopleView">
-		<partial name="_PeopleList" model="Model" />
-	</div>
-</div>
-
-<div class="container" id="details_container" style="display:none">
-	<input type="number" id="id_text" placeholder="Person ID" />
-	<input type="button" id="getDetails" value="Show" />
-	<input type="button" id="removePerson" value="Delete" />
-
-	<div id="detailsView">
-	</div>
-</div>
-
-<script type="text/javascript">
-
-	$(document).ready(function () {
-		$("#show_list").on("click", function () {
-			$("#details_container").css("display", "none");
-			$("#list_container").css("display", "block");
-		});
-		$("#show_details").on("click", function () {
-			$("#list_container").css("display", "none");
-			$("#details_container").css("display", "block");
-		});
-		$("#newPerson").on("click", function () {
-			$.ajax(
-				{
-					type: 'GET',
-					url: "/People/Create",
-					success: function (response) {
-						$("#createView").html(response);
-					}
-				})
-		});
-		
-		$("#searchPerson").on("submit", function (ev) {
-			ev.preventDefault();
-			let searchValue = $("#searchValue").val();
-			$.ajax(
-				{
-					type: 'POST',
-					url: "/People/Search",
-					data: searchValue,
-					success: function (response) {
-
-						$("#peopleView").html(response);
-					},
-					error: function (response) {
-						$("#message").html(response);
-					}
-				}
-			);
-		});
-
-		$("#getDetails").on("click", function () {
-			let id = parseInt($("#id_text").val());
-
-			$.ajax(
-				{
-					type: 'GET',
-					url: "/People/Details/" + id,
-					success: function (response) {
-						$("#detailsView").html(response);
-					},
-					error: function (response) {
-						$("#detailsView").html(response.responseJSON);
-					}
-				});
-		});
-		$("#removePerson").on("click", function () {
-			let id = parseInt($("#id_text").val());
-			$.ajax(
-				{
-					type: 'POST',
-					url: "/People/Delete/" + id,
-					success: function (response) {
-						$("#" + id).remove();
-						$("#detailsView").html(response);
-					},
-					error: function (response) {
-
-						$("#detailsView").html(response.responseJSON);
-					}
-				});
-		});
-		$(document).on("click", "[name='delete_row']", function ()
-		{
-			let row = $(this).closest(".row");
-
-			let id = parseInt(row.prop("id"));
-			$.ajax(
-				{
-					type: 'POST',
-					url: "/People/Delete/" + id,
-					success: function (response) {
-						if (row.parent().attr("id") == "detailsView") {
-							$("#" + id).remove();
-							$("#detailsView").html(response);
-						} else {
-							$("#message").html(response);
-							row.remove;
-						}
-						row.remove();
-					},
-					error: function () {
-
-					}
-				});
-		});
-	});
-</script>

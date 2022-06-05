@@ -1,0 +1,21 @@
+﻿@model CityModel
+
+@{
+	_ = Model.GetItem;
+}
+
+<div id="peopleList" class="container">
+	<div class="row" id="columnNames">
+		@for(int i = 0 ; i < City.StringifyNames.Length ; i++)
+		{
+			<div class="col @City.StringifyNames[i]">
+				@City.StringifyDisplayNames[i]
+			</div>
+		}
+		<div class="col">Remove</div>
+	</div>
+	@while(!Model.ListEnd)
+	{
+		<partial name="_city" model="Model.GetItem" />
+	}
+</div>@*<a class="PersonId" id="@Model.Id" href="">@Model.Id</a>*@

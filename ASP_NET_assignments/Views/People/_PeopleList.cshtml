@@ -1,47 +1,21 @@
 ﻿@model PeopleModel
 
 @{
-	ViewData["Title"] = "People List";
-	_ = Model.GetPerson;
+	_ = Model.GetItem;
 }
 
 <div id="peopleList" class="container">
-	<div class="row" id="columnNames">
-		@for(int i = 0 ; i < Person.stringifyNames.Length ; i++)
+	<div class="row" id="columnNames"><p>
+		@for(int i = 0 ; i < Person.StringifyNames.Length ; i++)
 		{
-			<div class="col @Person.stringifyNames[i]">
-				@Person.stringifyDisplayNames[i]
+			<div class="col @Person.StringifyNames[i]">
+				@Person.StringifyDisplayNames[i]
 			</div>
 		}
-		<div class="col">Remove</div>
+		<div class="col">Remove</div></p>
 	</div>
 	@while(!Model.ListEnd)
 	{
-		<partial name="_person" model="Model.GetPerson" />
+		<partial name="_person" model="@Model.GetItem" />
 	}
 </div>
-
-@*<table id="peopleData">
-	<thead>
-		<tr>
-			@foreach(string postName in Model.postNames)
-			{
-				<th>@postName</th>
-			}
-			<th>X</th>
-		</tr>
-	</thead>
-
-	@for(int i = 0 ; i < Model.PeopleData.Count ; i++)
-	{
-		string[] row = Model.PeopleData[i];
-
-		<tr id="peopleData_row @i">
-			@foreach(string post in row)
-			{
-				<td>@post</td>
-			}
-			<td><button name="delete_row">Remove</button></td>
-		</tr>
-	}
-</table>*@

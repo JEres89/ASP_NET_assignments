@@ -1,69 +1,82 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
 	[Table("PeopleDataTable")]
 	[BindProperties]
-	public class Person : I_DBformData
+	public class Person : I_DbDataModel<Person>
 	{
 
 		[Display(Name = "Person ID")]
 		[Key]
 		[Editable(false)]
-		public int Id { get; set; }
+		override public int Id { get; set; }
 
 		[Display(Name = "Full name")]
 		[Required]
-		public string Name {
-			get; set;
-		}
+		public string Name { get; set; }
 
 		[Display(Name = "Phone number")]
 		[Required]
 		[Phone]
-		public string Phonenumber {
-			get; set;
-		}
+		public string Phonenumber { get; set; }
 
 		[Display(Name = "City of Residence")]
 		[Required]
-		public string City {
-			get; set;
-		}
+		public string CityName { get; set; }
 
-		public string[] StringifyValues {
+		public City City { get; set; }
+
+		override public string[] StringifyValues {
 			get {
-				return new string[] { Id.ToString(), Name, Phonenumber, City };
+				return new string[] { Id.ToString(), Name, Phonenumber, CityName };
 			}
 		}
 
-		public static string[] stringifyNames { get; } = new string[] {
-			"Id", "Name", "Phonenumber", "City" };
-		public string[] StringifyNames { get => stringifyNames; }
+		public static new string[] StringifyNames { get; } = new string[] {
+			"Id", "Name", "Phonenumber", "CityName" };
+		//override public string[] StringifyNames { get => stringifyNames; }
 
-		public static string[] stringifyDisplayNames { get; } = new string[] {
+		public static new string[] StringifyDisplayNames { get; } = new string[] {
 			"Person ID", "Full name", "Phone number", "City of Residence" };
-		public string[] StringifyDisplayNames { get => stringifyDisplayNames; }
+		//override public string[] StringifyDisplayNames { get => stringifyDisplayNames; }
 
 		public Person()
 		{
-			//Id = VirtualDatabase.RandId;
 		}
-		private Person(int id, string name, string phonenumber, string city)
+		private Person(int id, string name, string phonenumber, string cityName)
 		{
 			Id = id;
 			Name = name;
 			Phonenumber = phonenumber;
-			City = city;
+			CityName = cityName;
 		}
-		public Person(string name, string phonenumber, string city) : this(
-			VirtualDatabase.RandId, name, phonenumber, city)
+		public Person(string name, string phonenumber, string cityName) : this(
+			VirtualDatabase.RandId, name, phonenumber, cityName)
 		{
 		}
+
+		public override Person MakeInstance(string[] values)
+		{
+			if(values.Length<3)
+			{
+				return null;
+			}
+			return new Person(values[0], values[1], values[2]);
+		}
+
+		//public static new IQueryable<Person> Search(DbSet<Person> dataSet, string value)
+		//{
+		//	return dataSet.Where(row =>
+		//		row.Name.Contains(value) || 
+		//		row.CityName.Contains(value) ||
+		//		row.Phonenumber.Contains(value)
+		//	);
+		//}
 	}
 }
