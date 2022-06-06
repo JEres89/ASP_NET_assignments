@@ -30,6 +30,7 @@ namespace ASP_NET_assignments.Models
 		[Required]
 		public string CityName { get; set; }
 
+		[ForeignKey("CityName")]
 		public City City { get; set; }
 
 		override public string[] StringifyValues {
@@ -37,13 +38,20 @@ namespace ASP_NET_assignments.Models
 				return new string[] { Id.ToString(), Name, Phonenumber, CityName };
 			}
 		}
-
-		public static new string[] StringifyNames { get; } = new string[] {
+		static Person()
+		{
+			StringifyNames = new string[] {
 			"Id", "Name", "Phonenumber", "CityName" };
+			StringifyDisplayNames = new string[] {
+			"Person ID", "Full name", "Phone number", "City of Residence" };
+			TableName = "PeopleDataTable";
+		}
+		//public static new string[] StringifyNames  = new string[] {
+		//	"Id", "Name", "Phonenumber", "CityName" };
 		//override public string[] StringifyNames { get => stringifyNames; }
 
-		public static new string[] StringifyDisplayNames { get; } = new string[] {
-			"Person ID", "Full name", "Phone number", "City of Residence" };
+		//public static new string[] StringifyDisplayNames { get; } = new string[] {
+		//	"Person ID", "Full name", "Phone number", "City of Residence" };
 		//override public string[] StringifyDisplayNames { get => stringifyDisplayNames; }
 
 		public Person()

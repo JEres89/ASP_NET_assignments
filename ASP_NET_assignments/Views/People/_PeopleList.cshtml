@@ -1,14 +1,23 @@
-﻿@model PeopleModel
+﻿@model PeopleViewModel
 
 @{
 	_ = Model.GetItem;
 }
-
+<style>
+	#peopleList .itemRow:hover {
+		background-color: moccasin;
+		cursor: pointer;
+	}
+	.removeEntitybtn:hover {
+		background-color: orangered;
+		cursor: pointer;
+	}
+</style>
 <div id="peopleList" class="container">
 	<div class="row" id="columnNames"><p>
-		@for(int i = 0 ; i < Person.StringifyNames.Length ; i++)
+		@for(int i = 0 ; i < Person.StringifyDisplayNames.Length ; i++)
 		{
-			<div class="col @Person.StringifyNames[i]">
+			<div class="col">
 				@Person.StringifyDisplayNames[i]
 			</div>
 		}
@@ -16,6 +25,6 @@
 	</div>
 	@while(!Model.ListEnd)
 	{
-		<partial name="_person" model="@Model.GetItem" />
+		<partial name="_Person" model="@Model.GetItem" />
 	}
 </div>

@@ -1,6 +1,6 @@
 ﻿let controller = document.querySelector("title").textContent;
 
-function ShowCreate() {
+function GetCreate() {
 	$.ajax(
 		{
 			type: 'GET',
@@ -29,19 +29,35 @@ function GetDetails() {
 		}
 	);
 }
-function ShowDetails() {
-	$("#details_container").toggle();
+function ToggleDetails() {
+	$("#details_container").toggle("fast");
 	//css("display", "block");
+}
+function ShowDetails() {
+	$("#details_container").show("fast");
 }
 function ShowList() {
 	//$("#details_container").css("display", "none");
-	$("#list_container").toggle();
+	$("#list_container").toggle("fast");
+}
+function ShowCreate() {
+	$("#create_view").toggle("fast");
 }
 $(document).ready(function () {
 
 	$("#show_list").on("click", ShowList);
-	$("#show_details").on("click", ShowDetails);
-	$("#new_entry").on("click", ShowCreate);
+	$("#show_details").on("click", ToggleDetails);
+	$("#new_entry").on("click", function () {
+		let view = $("#create_view");
+
+		if (view.children("form").length === 1) {
+			ShowCreate();
+		}
+		else {
+			GetCreate();
+			ShowCreate();
+		}
+	});
 
 	$("#get_details").on("click", GetDetails);
 
@@ -52,7 +68,7 @@ $(document).ready(function () {
 			{
 				type: 'POST',
 				url: `/${controller}/Search`,
-				data: searchValue,
+				data: { searchValue : searchValue },
 				success: function (response) {
 					$("#list_view").html(response);
 				},

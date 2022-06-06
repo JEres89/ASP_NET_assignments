@@ -1,19 +1,18 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+//using System.Collections;
+//using System.Collections.Specialized;
+//using System.ComponentModel.DataAnnotations;
 
 
 namespace ASP_NET_assignments.Models
 {
 	public class SearchModel<T1, T2> where T1 : DbSet<T2> where T2 : I_DbDataModel<T2>
 	{
-		readonly T1 dataSet;
-		private int[] searchPosts = new int[0];
+		public T1 dataSet;
+		private int[] searchColumns = new int[0];
 		private string lastSearch;
 		List<T2> result = new List<T2>();
 		
@@ -24,14 +23,13 @@ namespace ASP_NET_assignments.Models
 			get; private set;
 		} = false;
 
-		public SearchModel(ref T1 data)
+		public SearchModel(T1 data)
 		{
 			dataSet = data;
 		}
-
-		public void SetSearchScope(int[] postIndexes)
+		public void SetSearchScope(int[] columnIndexes)
 		{
-			this.searchPosts = postIndexes;
+			this.searchColumns = columnIndexes;
 		}
 		public void ClearSearch()
 		{
@@ -40,9 +38,6 @@ namespace ASP_NET_assignments.Models
 			result.Clear();
 		}
 
-		/**
-		 * Call if #Collection is changed (added/removeded value).
-		 */
 		public bool RenewSearch()
 		{
 			return Search(lastSearch);
@@ -60,40 +55,49 @@ namespace ASP_NET_assignments.Models
 
 			lastSearch = value;
 			HasSearched = true;
-
-			if(searchPosts.Length < 1)
+			value = $"%{value}%";
+			if(searchColumns.Length < 1)
 			{
-
 				string[] columnNames = I_DbDataModel<T2>.StringifyNames;
 				string filters = string.Empty;
+				//SqlParameter[] sqlParameters = new SqlParameter[columnNames.Length];
 				SqlParameter sqlParameter = new SqlParameter("value", value);
-
 				for(int i = 0 ; i < columnNames.Length ; i++)
 				{
 					string columnName = columnNames[i];
 
-					if(filters != string.Empty) {
+					if(filters != string.Empty)
+					{
 						filters += " OR ";
 					}
-					filters += $"{columnName} LIKE '%@value%'";
+					filters += $"{columnName} LIKE @value";
+					//sqlParameters[i] = new SqlParameter(columnName, value);
 				}
+				//string filters = "@value in (";
+				//for(int i = 0 ; i < columnNames.Length ; i++)
+				//{
+				//	string columnName = columnNames[i];
+				//	char divider = i == columnNames.Length - 1 ? ')' : '\u002C';
+				//	filters += $"{columnName}{divider} ";
+				//}
+				//result.AddRange(dataSet.FromSqlRaw(query, sqlParameter));
 
-				string query = $"SELECT * FROM {nameof(T2)} WHERE {filters}";
+				string query = $"SELECT * FROM dbo.{I_DbDataModel<T2>.TableName} WHERE {filters}";
 
-				result = dataSet.FromSqlRaw(query, sqlParameter).ToList();
+				result.AddRange(dataSet.FromSqlRaw(query, sqlParameter));
 
 				//result = I_DbDataModel<T2>.Search(dataSet, value).ToList();
-				//result = dataSet.Where(row => row.StringifyValues.Any(post => post.Contains(value))).ToList();
+				//result = dataSet.Where(row => row.StringifyValues.Any(col => col.Contains(value))).ToList();
 			}
-			else if(searchPosts.Length > 1)
+			else if(searchColumns.Length > 1)
 			{
 				string[] columnNames = I_DbDataModel<T2>.StringifyNames;
 				string filters = string.Empty;
 				SqlParameter sqlParameter = new SqlParameter("value", value);
 
-				for(int i = 0 ; i < searchPosts.Length ; i++)
+				for(int i = 0 ; i < searchColumns.Length ; i++)
 				{
-					int column = searchPosts[i];
+					int column = searchColumns[i];
 					string columnName = columnNames[column];
 
 					if(filters != string.Empty)
@@ -112,7 +116,7 @@ namespace ASP_NET_assignments.Models
 			//{
 			//	foreach(var row in dataSet)
 			//	{
-			//		if(row.StringifyValues[searchPosts[0]].Contains(value))
+			//		if(row.StringifyValues[searchColumns[0]].Contains(value))
 			//		{
 			//			result.Add(row);
 			//		}

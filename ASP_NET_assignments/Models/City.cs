@@ -1,10 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace ASP_NET_assignments.Models
 {
+	[Table("Cities")]
+	[BindProperties]
 	public class City : I_DbDataModel<City>
 	{
 		[Display(Name = "City ID")]
@@ -16,12 +20,14 @@ namespace ASP_NET_assignments.Models
 		[Required]
 		public string Name { get; set; }
 
-		//[Display(Name = "Country")]
-		//[Required]
-		//public Country Country { get; set; }
-
 		[Display(Name = "Residents")]
 		public List<Person> People { get; set; } = new List<Person>();
+
+		[Display(Name = "Country")]
+		[Required]
+		public string CountryName { get; set; }
+		[ForeignKey("CountryName")]
+		public Country Country { get; set; }
 
 		override public string[] StringifyValues {
 			get {
@@ -29,42 +35,54 @@ namespace ASP_NET_assignments.Models
 					StringBuilder s = new StringBuilder();
 					foreach (Person p in People)
 					{
-						s.Append(p.Name).Append("U+002C");
+						if (s.Length != 0)
+						{
+							s.Append(", ");
+						}
+						s.Append(p.Name);
 					}
 					return s.ToString();})();
 
 				return new string[] { Id.ToString(), Name,
-					people };
+					people, CountryName };
 			}
 		}
-
-		public static new string[] StringifyNames { get; } = new string[] {
-			"Id", "Name", "People" };
+		static City()
+		{
+			StringifyNames = new string[] {
+			"Id", "Name", "CountryName" };
+			StringifyDisplayNames = new string[] {
+			"City ID", "City name", "Residents", "Country" };
+			TableName = "Cities";
+		}
+		//public static new string[] StringifyNames { get; } = new string[] {
+		//	"Id", "Name", "People" };
 		//public string[] StringifyNames { get => stringifyNames; }
 
-		public static new string[] StringifyDisplayNames { get; } = new string[] {
-			"City ID", "City name", "Residents" };
+		//public static new string[] StringifyDisplayNames { get; } = new string[] {
+		//	"City ID", "City name", "Residents" };
 		//public string[] StringifyDisplayNames { get => stringifyDisplayNames; }
 		public City()
 		{
 		}
-		private City(int id, string name)
+		private City(int id, string name, string countryName)
 		{
 			Id = id;
 			Name = name;
+			CountryName = countryName;
 		}
-		public City(string name) : this(
-			VirtualDatabase.RandId, name)
+		public City(string name, string countryName) : this(
+			VirtualDatabase.RandId, name, countryName)
 		{
 		}
 
 		public override City MakeInstance(string[] values)
 		{
-			if(values.Length < 1)
+			if(values.Length < 2)
 			{
 				return null;
 			}
-			return new City(values[0]);
+			return new City(values[0], values[1]);
 		}
 	}
 }

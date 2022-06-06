@@ -7,8 +7,9 @@ namespace ASP_NET_assignments.Models
 	{
 		public abstract int Id { get; set; }
 		public abstract string[] StringifyValues { get; }
-		public static string[] StringifyNames { get; }
-		public static string[] StringifyDisplayNames { get; }
+		public static string[] StringifyNames { get; protected set; }
+		public static string[] StringifyDisplayNames { get; protected set; }
+		public static string TableName { get; protected set; }
 
 		public abstract T MakeInstance(string[] values);
 	}

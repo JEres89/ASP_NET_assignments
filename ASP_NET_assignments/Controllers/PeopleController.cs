@@ -26,13 +26,14 @@ namespace ASP_NET_assignments.Controllers
 
 		public IActionResult Index()
 		{
-			return View("People", new PeopleModel(dbContext));
+			return View("People", PeopleViewModel.GetSessionModel(dbContext));
 		}
 
 		[HttpPost]
 		public IActionResult Search(string searchValue)
 		{
-			PeopleModel model = new PeopleModel(dbContext);
+			ViewData.Clear();
+			PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
 			model.Search(searchValue);
 
 			return PartialView("_PeopleList", model);
@@ -40,10 +41,11 @@ namespace ASP_NET_assignments.Controllers
 		[HttpGet]
 		public IActionResult Details(int id)
 		{
-			PeopleModel model = new PeopleModel(dbContext);
+			ViewData.Clear();
+			PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
 			if(id == 0 || !model.SetNextItem(id))
 			{
-				var json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
+				var json = Json($"A person with ID {id} does not exist in the database.");
 				json.StatusCode = 404;
 				return json;
 			}
@@ -51,6 +53,7 @@ namespace ASP_NET_assignments.Controllers
 		}
 		public IActionResult Create()
 		{
+			ViewData.Clear();
 			ViewBag.CityOptions = new SelectList(dbContext.Cities, "Name" ,"Name");
 			return PartialView("_CreatePerson");
 		}
@@ -58,36 +61,37 @@ namespace ASP_NET_assignments.Controllers
 		[HttpPost]
 		public IActionResult Create(Person person)
 		{
-			PeopleModel model = new PeopleModel(dbContext);
+			ViewData.Clear();
+			PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
 			if(ModelState.IsValid)
 			{
 				model.AddItem(person);
-				ViewBag.addPersonResult = "<p>Successfully added the new person</p>";
+				ViewBag.message = "Successfully added the new person";
 				return View("People", model);
 			}
 			else
 			{
-				ViewBag.addPersonResult = "<p>Incorrect form data</p>";
+				ViewBag.message = "Incorrect form data";
 				return PartialView("_CreatePerson", person);
 			}
-			//return View("People", model);
 		}
 		[HttpGet]
 		[HttpPost]
 		public IActionResult Delete(int? id)
 		{
+			ViewData.Clear();
 			JsonResult json;
 			if (id != null)
 			{
-				PeopleModel model = new PeopleModel(dbContext);
+				PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
 				if(model.RemoveItem(id.Value))
 				{
-					json = Json($"<p>Person with ID {id} has been removed from the database.</p>");
+					json = Json($"Person with ID {id} has been removed from the database.");
 					json.StatusCode = 200;
 				}
 				else
 				{
-					json = Json($"<p>A person with ID {id} does not exist in the database.</p>");
+					json = Json($"A person with ID {id} does not exist in the database.");
 					json.StatusCode = 404;
 				}
 			}

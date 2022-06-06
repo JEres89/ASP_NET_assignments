@@ -4,18 +4,18 @@
 }
 
 <div id="@Model.Id" class="row itemRow">
-	<div class="col @Html.NameFor(model => model.Id)">
+	<div class="col table-hover @Html.NameFor(model => model.Id)">
 		@Model.Id
 	</div>
 	<div class="col @Html.NameFor(model => model.Name)">
 		@Model.Name
 	</div>
-	<div class="col @Html.NameFor(model => model.Phonenumber)">
+	<div class="col table-hover @Html.NameFor(model => model.Phonenumber)">
 		@Model.Phonenumber
 	</div>
-	<div class="col @Html.NameFor(model => model.CityName)">
+	<div class="col table-hover @Html.NameFor(model => model.CityName)">
 		@Model.CityName
 	</div>
 
-	<div class="col removeEntitybtn"><button class="removeEntitybtn" name="delete_row" value="Remove"></button></div>
+	<div class="col removeEntitybtn" name="delete_row">Remove</div>
 </div>

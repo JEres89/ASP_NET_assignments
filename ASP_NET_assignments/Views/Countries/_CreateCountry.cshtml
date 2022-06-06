@@ -1,0 +1,26 @@
+﻿@model Country
+@Html.AntiForgeryToken()
+@{
+}
+
+<form asp-action="Create">
+	<fieldset class="row">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<legend>Add Country</legend>
+		<label asp-for="Name" class="control-label"></label>
+		<input asp-for="Name" id="Name" class="form-control" placeholder="Name of Country" />
+		<span asp-validation-for="Name" class="text-danger"></span>
+
+		<label asp-for="Cities" class="control-label"></label>
+		<select asp-for="Cities" asp-items="@ViewBag.CityOptions" multiple id="Cities" class="form-control">
+			<option disabled>Select any cities in the country</option>
+		</select>
+		<span asp-validation-for="Cities" class="text-danger"></span>
+
+		<input type="submit" id="create_submit" value="Add Country" />
+	</fieldset>
+</form>
+
+@{
+	await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}

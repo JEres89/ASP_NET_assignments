@@ -39,14 +39,18 @@ namespace ASP_NET_assignments.Models
 					break;
 				case City _:
 					list.AddRange( new T[] {
-						type.MakeInstance(new string[]{"Göteborg" }),
-						type.MakeInstance(new string[]{"Staden" }),
-						type.MakeInstance(new string[]{"Skogen" }),
-						type.MakeInstance(new string[]{"Luftslottet" })
+						type.MakeInstance(new string[]{"Göteborg","Sverige"}),
+						type.MakeInstance(new string[]{"Staden","Sverige" }),
+						type.MakeInstance(new string[]{"Skogen","Norge" }),
+						type.MakeInstance(new string[]{"Luftslottet","Ingenstans" })
 					});
 					break;
-				case "Country":
-
+				case Country _:
+					list.AddRange(new T[] {
+						type.MakeInstance(new string[]{"Sverige" }),
+						type.MakeInstance(new string[]{"Norge" }),
+						type.MakeInstance(new string[]{"Ingenstans" })
+					});
 					break;
 				default:
 					break;

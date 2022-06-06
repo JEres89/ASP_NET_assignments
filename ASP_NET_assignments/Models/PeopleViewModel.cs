@@ -6,31 +6,26 @@ using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
-	public class PeopleModel : I_DataViewModel <Person>
+	public class PeopleViewModel : I_DataViewModel <Person>
 	{
-		//private static PeopleModel cache;
+		private static PeopleViewModel cache;
 		private AppDbContext _database;
-		private string[] postNames;
 		private DbSet<Person> peopleData;
 		private readonly List<Person> selectedPeopleData;
 		private readonly SearchModel<DbSet<Person>, Person> searchModel;
 		private IEnumerator<Person> E_people;
-		private bool listEnd = false;
-		public List<Person> PeopleData {
-			get {
-				if(searchModel.HasSearched)
-				{
-					return selectedPeopleData;
-				}
-				return peopleData.ToList();
-			}
-		}
-		public string[] PostNames { get => postNames; set => postNames =  value ; }
 
-		public bool ListEnd {
-			get => listEnd;
-			private set => listEnd = value;
-		}
+		//public List<Person> PeopleData {
+		//	get {
+		//		if(searchModel.HasSearched)
+		//		{
+		//			return selectedPeopleData;
+		//		}
+		//		return peopleData.ToList();
+		//	}
+		//}
+		public string[] ColumnNames { get; set; }
+		public bool ListEnd { get; private set; } = false;
 		public Person GetItem {
 			get {
 				if(ListEnd)
@@ -58,30 +53,29 @@ namespace ASP_NET_assignments.Models
 			return false;
 		}
 
-		//public static PeopleModel GetSessionModel(AppDbContext dbContext)
-		//{
-		//	if(cache == null)
-		//	{
-		//		cache = new PeopleModel(dbContext);
-		//	}
-		//	else
-		//	{
-		//		cache._database = dbContext;
-		//		cache.peopleData = cache._database.People;
-		//		cache.Refresh();
-		//	}
-		//	return cache;
-		//}
+		public static PeopleViewModel GetSessionModel(AppDbContext dbContext)
+		{
+			if(cache == null)
+			{
+				cache = new PeopleViewModel(dbContext);
+			}
+			else
+			{
+				if(cache._database != dbContext)
+				{
+					cache._database = dbContext;
+					cache.searchModel.dataSet = cache.peopleData = cache._database.People;
+				}
+				else cache.Reset();
+			}
+			return cache;
+		}
 
-		public PeopleModel(AppDbContext dbContext)
+		public PeopleViewModel(AppDbContext dbContext)
 		{
 			_database = dbContext;
-			//var session = VirtualDatabase.GetDatabase(_databaseId);
-			//postNames = session.postNames;
-			//PeopleData = session.data;
-			//Dictionary<int, Person> searchCollection = new Dictionary<int, Person>();
 			peopleData = _database.People;
-			searchModel = new SearchModel<DbSet<Person>, Person>(ref peopleData);
+			searchModel = new SearchModel<DbSet<Person>, Person>(peopleData);
 			selectedPeopleData = searchModel.Result;
 			Reset();
 		}
@@ -101,6 +95,7 @@ namespace ASP_NET_assignments.Models
 		{
 			E_people = peopleData.AsEnumerable().GetEnumerator();
 			ListEnd = false;
+			searchModel.ClearSearch();
 		}
 		public void Search(string value)
 		{
@@ -127,7 +122,8 @@ namespace ASP_NET_assignments.Models
 			var success = _database.People.Remove(_database.People.Find(id));
 			_database.SaveChanges();
 			Refresh();
-			return success.Entity == null;
+
+			return !_database.People.Contains(success.Entity);
 		}
 	}
 }

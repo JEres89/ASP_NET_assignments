@@ -2,7 +2,7 @@
 {
 	public interface I_DataViewModel<T> where T : I_DbDataModel<T>
 	{
-		string[] PostNames { get; set; }
+		string[] ColumnNames { get; set; }
 		public bool ListEnd { get; }
 		public T GetItem { get; }
 		public bool SetNextItem(int id);

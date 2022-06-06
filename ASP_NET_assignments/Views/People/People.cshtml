@@ -1,13 +1,9 @@
-﻿@model PeopleModel
+﻿@model PeopleViewModel
 @{
 	ViewData["Title"] = "People";
-	if(ViewBag.addPersonResult == null)
-	{
-		ViewData["listDisplay"] = "style=\"display:none\"";
-	}
 }
 
-<div class="container" id="People_view" style="height: 600px;">
+<div class="container" id="People_view" style="min-height: 600px;">
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
 	<h1>People Index</h1>
@@ -23,7 +19,7 @@
 		</div>
 	</div>
 
-	<p id="message"></p>
+	<p id="message">@Html.Raw(ViewBag.message) </p>
 
 	<div class="container" id="details_container" style="display:none">
 		<input type="number" id="id_text" placeholder="Person ID" />
@@ -33,11 +29,9 @@
 		<div id="details_view">
 		</div>
 	</div>
-
-	<div id="create_view">
-		@Html.Raw(ViewBag.addPersonResult)
+	<div id="create_view" style="display:none">
 	</div>
-	<div class="container" id="list_container" @Html.Raw(@ViewData["listDisplay"])>
+	<div class="container" id="list_container" >
 		<form id="search_entries">
 			<fieldset>
 				<legend>Find Person</legend>

@@ -6,21 +6,16 @@ using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
-	public class CityModel : I_DataViewModel<City>
+	public class CityViewModel : I_DataViewModel<City>
 	{
 		private AppDbContext _database;
-		private string[] postNames;
 		private DbSet<City> citiesData;
 		private readonly List<City> selectedCitiesData;
 		private readonly SearchModel<DbSet<City>, City> searchModel;
 		private IEnumerator<City> E_cities;
-		private bool listEnd = false;
 
-		public string[] PostNames { get => postNames; set => postNames = value; }
-		public bool ListEnd {
-			get => listEnd;
-			private set => listEnd = value;
-		}
+		public string[] ColumnNames { get; set; }
+		public bool ListEnd { get; private set; } = false;
 		public City GetItem {
 			get {
 				if(ListEnd)
@@ -46,11 +41,12 @@ namespace ASP_NET_assignments.Models
 			Reset();
 			return false;
 		}
-		public CityModel(AppDbContext dbContext)
+		public CityViewModel(AppDbContext dbContext)
 		{
 			_database = dbContext;
+			_database.Cities.Include(c => c.People).ToList();
 			citiesData = _database.Cities;
-			searchModel = new SearchModel<DbSet<City>, City>(ref citiesData);
+			searchModel = new SearchModel<DbSet<City>, City>(citiesData);
 			selectedCitiesData = searchModel.Result;
 			Reset();
 		}
@@ -70,6 +66,7 @@ namespace ASP_NET_assignments.Models
 		{
 			E_cities = citiesData.AsEnumerable().GetEnumerator();
 			ListEnd = false;
+			searchModel.ClearSearch();
 		}
 		public void Search(string value)
 		{
@@ -84,7 +81,7 @@ namespace ASP_NET_assignments.Models
 			ListEnd = false;
 		}
 		public void AddItem(City city)
-{
+		{
 			_database.Cities.Add(city);
 			_database.SaveChanges();
 			Refresh();
@@ -92,11 +89,10 @@ namespace ASP_NET_assignments.Models
 
 		public bool RemoveItem(int id)
 		{
-			var success = _database.People.Remove(_database.People.Find(id));
+			var success = _database.Cities.Remove(_database.Cities.Find(id));
 			_database.SaveChanges();
 			Refresh();
-			return success.Entity == null;
+			return !_database.Cities.Contains(success.Entity);
 		}
-
 	}
 }

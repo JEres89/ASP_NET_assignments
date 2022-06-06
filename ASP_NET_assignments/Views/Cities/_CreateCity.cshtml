@@ -11,14 +11,17 @@
 		<input asp-for="Name" id="Name" class="form-control" placeholder="Name of City" />
 		<span asp-validation-for="Name" class="text-danger"></span>
 
-		@*<label asp-for="Country" class="control-label"></label>
-		<input asp-for="Country" id="Country" placeholder="Residents" />*@
-
 		<label asp-for="People" class="control-label"></label>
-		<select asp-for="People" asp-items="@ViewBag.PersonOptions" multiple id="People" class="form-control" >
-		<option disabled>Select residents if any</option>
+		<select asp-for="People" asp-items="@ViewBag.PersonOptions" multiple id="People" class="form-control">
+			<option disabled>Select residents if any</option>
 		</select>
 		<span asp-validation-for="People" class="text-danger"></span>
+
+		<label asp-for="CountryName" class="control-label"></label>
+		<select asp-for="CountryName" asp-items="@ViewBag.CountryOptions" id="CountryName" class="form-control">
+			<option disabled selected>--- SELECT ---</option>
+		</select>
+		<span asp-validation-for="CountryName" class="text-danger"></span>
 
 		<input type="submit" id="create_submit" value="Add City" />
 	</fieldset>

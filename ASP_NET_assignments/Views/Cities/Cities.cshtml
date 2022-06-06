@@ -1,51 +1,50 @@
-﻿@model CityModel
+﻿@model CityViewModel
 @{
 	ViewData["Title"] = "Cities";
-	if(ViewBag.addCityResult == null)
-	{
-		ViewData["listDisplay"] = "style=\"display:none\"";
-	}
 }
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
-<h1>Cities Index</h1>
-<div class="row">
-	<div class="col-2">
-		<input type="button" id="show_list" value="List Cities" />
+<div class="container" id="Cities_view" style="min-height: 600px;">
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+	<h1>Cities Index</h1>
+	<div class="row">
+		<div class="col-2">
+			<input type="button" id="show_list" value="List Cities" />
+		</div>
+		<div class="col-2">
+			<input type="button" id="show_details" value="Details" />
+		</div>
+		<div class="col-2">
+			<input type="button" id="new_entry" value="Add a new City" />
+		</div>
 	</div>
-	<div class="col-2">
-		<input type="button" id="show_details" value="Details" />
+
+	<p id="message">@Html.Raw(ViewBag.message)</p>
+
+	<div class="container" id="details_container" style="display:none">
+		<input type="number" id="id_text" placeholder="City ID" />
+		<input type="button" id="get_details" value="Show" />
+		<input type="button" id="remove_row" value="Delete" />
+
+		<div id="details_view">
+		</div>
 	</div>
+	<div id="create_view" style="display:none">
+	</div>
+	<div class="container" id="list_container" >
+		<form id="search_entries">
+			<fieldset>
+				<legend>Find City</legend>
+				<input type="hidden" name="formName" value="search_city" />
+				<input type="text" id="search_value" placeholder="Search" />
+				<input type="submit" id="search_submit" value="Find" />
+			</fieldset>
+		</form>
+
+		<div id="list_view">
+			<partial name="_CitiesList" model="@Model" />
+		</div>
+	</div>
+
+	<script src="~/Scripts/ListView_scripts.js"></script>
 </div>
-
-<p id="message"></p>
-
-<div class="container" id="list_container" @Html.Raw(@ViewData["listDisplay"])>
-	<form id="search_entries">
-		<fieldset>
-			<legend>Find City</legend>
-			<input type="hidden" name="formName" value="search_cerson" />
-			<input type="text" id="search_value" placeholder="Search" />
-			<input type="submit" id="search_submit" value="Find" />
-		</fieldset>
-	</form>
-	<input type="button" id="new_entry" value="Add a new City" />
-	<div id="create_view">
-		@Html.Raw(ViewBag.addCityResult)
-	</div>
-
-	<div id="list_view">
-		<partial name="_CitiesList" model="@Model" />
-	</div>
-</div>
-
-<div class="container" id="details_container" style="display:none">
-	<input type="number" id="id_text" placeholder="City ID" />
-	<input type="button" id="get_details" value="Show" />
-	<input type="button" id="remove_row" value="Delete" />
-
-	<div id="detailsView">
-	</div>
-</div>
-
-<script src="~/Scripts/ListView_scripts.js"></script>

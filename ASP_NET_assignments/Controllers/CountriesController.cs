@@ -10,65 +10,64 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ASP_NET_assignments.Controllers
 {
-	public class CitiesController : Controller
+	public class CountriesController : Controller
 	{
 		private readonly AppDbContext dbContext;
 
-		public CitiesController(AppDbContext context)
+		public CountriesController(AppDbContext context)
 		{
 			dbContext = context;
 		}
 
 		public IActionResult Index()
 		{
-			return View("Cities", new CityViewModel(dbContext));
+			return View("Countries", new CountryViewModel(dbContext));
 		}
 
 		[HttpPost]
 		public IActionResult Search(string searchValue)
 		{
 			ViewData.Clear();
-			CityViewModel model = new CityViewModel(dbContext);
+			CountryViewModel model = new CountryViewModel(dbContext);
 			model.Search(searchValue);
 
-			return PartialView("_CitiesList", model);
+			return PartialView("_CountriesList", model);
 		}
 		[HttpGet]
 		public IActionResult Details(int id)
 		{
 			ViewData.Clear();
-			CityViewModel model = new CityViewModel(dbContext);
+			CountryViewModel model = new CountryViewModel(dbContext);
 			if(id == 0 || !model.SetNextItem(id))
 			{
-				var json = Json($"A City with ID {id} does not exist in the database.");
+				var json = Json($"A Country with ID {id} does not exist in the database.");
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_City", model.GetItem);
+			return PartialView("_Country", model.GetItem);
 		}
 		public IActionResult Create()
 		{
 			ViewData.Clear();
-			ViewBag.PersonOptions = new SelectList(dbContext.People, "Name", "Name");
-			ViewBag.CountryOptions = new SelectList(dbContext.Countries, "Name", "Name");
-			return PartialView("_CreateCity");
+			ViewBag.CityOptions = new SelectList(dbContext.Cities, "Name", "Name");
+			return PartialView("_CreateCountry");
 		}
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(City city)
+		public IActionResult Create(Country country)
 		{
 			ViewData.Clear();
-			CityViewModel model = new CityViewModel(dbContext);
+			CountryViewModel model = new CountryViewModel(dbContext);
 			if(ModelState.IsValid)
 			{
-				model.AddItem(city);
-				ViewBag.message = "Successfully added the new city";
-				return View("Cities", model);
+				model.AddItem(country);
+				ViewBag.message = "Successfully added the new country";
+				return View("Countries", model);
 			}
 			else
 			{
 				ViewBag.message = "Incorrect form data";
-				return PartialView("_CreateCity", city);
+				return PartialView("_CreateCountry", country);
 			}
 		}
 
@@ -80,15 +79,15 @@ namespace ASP_NET_assignments.Controllers
 			JsonResult json;
 			if(id != null)
 			{
-				CityViewModel model = new CityViewModel(dbContext);
+				CountryViewModel model = new CountryViewModel(dbContext);
 				if(model.RemoveItem(id.Value))
 				{
-					json = Json($"City with ID {id} has been removed from the database.");
+					json = Json($"Country with ID {id} has been removed from the database.");
 					json.StatusCode = 200;
 				}
 				else
 				{
-					json = Json($"A city with ID {id} does not exist in the database.");
+					json = Json($"A country with ID {id} does not exist in the database.");
 					json.StatusCode = 404;
 				}
 			}
