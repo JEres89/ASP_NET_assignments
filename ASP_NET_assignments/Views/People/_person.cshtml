@@ -1,21 +1,41 @@
 ﻿@model Person
 
 @{
+	if(ViewBag.details != null)
+		ViewData["Rowidentifiers"] = $" id=\"details_row\" name={@Model.Id}";
+	else
+		ViewData["Rowidentifiers"] = $" id={@Model.Id}";
 }
 
-<div id="@Model.Id" class="row itemRow">
-	<div class="col table-hover @Html.NameFor(model => model.Id)">
+<div @ViewData["Rowidentifiers"] class="row itemRow" >
+	<div class="col @Html.NameFor(model => model.Id)">
 		@Model.Id
 	</div>
 	<div class="col @Html.NameFor(model => model.Name)">
 		@Model.Name
 	</div>
-	<div class="col table-hover @Html.NameFor(model => model.Phonenumber)">
+	<div class="col @Html.NameFor(model => model.Phonenumber)">
 		@Model.Phonenumber
 	</div>
-	<div class="col table-hover @Html.NameFor(model => model.CityName)">
+	<div class="col @Html.NameFor(model => model.CityName)">
 		@Model.CityName
+	</div>
+	<div class="col @Html.NameFor(model => model.PersonLanguages)">
+		@Model.StringifyValues[4]
 	</div>
 
 	<div class="col removeEntitybtn" name="delete_row">Remove</div>
+
 </div>
+@{
+	if(ViewBag.details != null)
+	{
+		<form id="link_language" name="@Model.Id" style="display:none">
+			<label for="Languages" class="control-label">Select any @Html.DisplayNameFor(model => model.PersonLanguages) for @Model.Name</label>
+			<select asp-items="@ViewBag.LanguageOptions" multiple id="Languages">
+			</select>
+			<input type="submit" value="Apply" />
+		</form>
+	}
+}
+

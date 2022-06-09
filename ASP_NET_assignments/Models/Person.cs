@@ -1,9 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using ASP_NET_assignments.Data;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using System.Text;
 
 namespace ASP_NET_assignments.Models
 {
@@ -33,17 +34,38 @@ namespace ASP_NET_assignments.Models
 		[ForeignKey("CityName")]
 		public City City { get; set; }
 
+		[Display(Name = "Spoken Languages")]
+		public List<PersonLanguage> PersonLanguages { get; set; } = new List<PersonLanguage>();
+
 		override public string[] StringifyValues {
 			get {
-				return new string[] { Id.ToString(), Name, Phonenumber, CityName };
+				string languages = new Func<string>(() => {
+					StringBuilder s = new StringBuilder();
+					foreach (PersonLanguage l in PersonLanguages)
+					{
+						if (s.Length != 0)
+						{
+							s.Append(", ");
+						}
+						s.Append(_database.Languages.Find(l.LanguageId).Name);
+					}
+					return s.ToString();
+				})();
+				return new string[] { Id.ToString(), Name, Phonenumber, CityName, languages };
 			}
 		}
+		private AppDbContext _database;
+		override internal void setContext(AppDbContext database)
+		{
+			_database = database;
+		}
+
 		static Person()
 		{
 			StringifyNames = new string[] {
 			"Id", "Name", "Phonenumber", "CityName" };
 			StringifyDisplayNames = new string[] {
-			"Person ID", "Full name", "Phone number", "City of Residence" };
+			"Person ID", "Full name", "Phone number", "City of Residence", "Spoken Languages" };
 			TableName = "PeopleDataTable";
 		}
 		//public static new string[] StringifyNames  = new string[] {

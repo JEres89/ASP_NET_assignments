@@ -26,54 +26,48 @@ namespace ASP_NET_assignments.Models
 		//}
 		public string[] ColumnNames { get; set; }
 		public bool ListEnd { get; private set; } = false;
-		public Person GetItem {
+		public Person GetNextItem {
 			get {
-				if(ListEnd)
+				if(ListEnd = !E_people.MoveNext())
 				{
 					return null;
 				}
 				Person person = E_people.Current;
-				ListEnd = !E_people.MoveNext();
+				person.setContext(_database);
 
 				return person;
 			}
 		}
 
-		public bool SetNextItem(int id)
+		public Person GetItem(int id)
 		{
-			Reset();
-			while(E_people.MoveNext())
-			{
-				if(E_people.Current.Id == id)
-				{
-					return true;
-				}
-			}
-			Reset();
-			return false;
+			Person p= peopleData.Include(p => p.PersonLanguages).FirstOrDefault(p => p.Id == id);
+			p?.setContext(_database);
+			return p;
 		}
 
-		public static PeopleViewModel GetSessionModel(AppDbContext dbContext)
-		{
-			if(cache == null)
-			{
-				cache = new PeopleViewModel(dbContext);
-			}
-			else
-			{
-				if(cache._database != dbContext)
-				{
-					cache._database = dbContext;
-					cache.searchModel.dataSet = cache.peopleData = cache._database.People;
-				}
-				else cache.Reset();
-			}
-			return cache;
-		}
+		//public static PeopleViewModel GetSessionModel(AppDbContext dbContext)
+		//{
+		//	if(cache == null)
+		//	{
+		//		cache = new PeopleViewModel(dbContext);
+		//	}
+		//	else
+		//	{
+		//		if(cache._database != dbContext)
+		//		{
+		//			cache._database = dbContext;
+		//			cache.searchModel.dataSet = cache.peopleData = cache._database.People;
+		//		}
+		//		else cache.Reset();
+		//	}
+		//	return cache;
+		//}
 
 		public PeopleViewModel(AppDbContext dbContext)
 		{
 			_database = dbContext;
+			_database.People.Include(p => p.PersonLanguages).ToList();
 			peopleData = _database.People;
 			searchModel = new SearchModel<DbSet<Person>, Person>(peopleData);
 			selectedPeopleData = searchModel.Result;
@@ -82,7 +76,7 @@ namespace ASP_NET_assignments.Models
 		private void Refresh()
 		{
 			if(searchModel.RenewSearch())
-			{
+			{	
 				E_people = selectedPeopleData.GetEnumerator();
 				ListEnd = false;
 			}
@@ -102,12 +96,12 @@ namespace ASP_NET_assignments.Models
 			if(searchModel.Search(value))
 			{
 				E_people = selectedPeopleData.GetEnumerator();
+				ListEnd = false;
 			}
 			else
 			{
 				Reset();
 			}
-			ListEnd = false;
 		}
 
 		public void AddItem(Person person)
@@ -119,10 +113,15 @@ namespace ASP_NET_assignments.Models
 
 		public bool RemoveItem(int id)
 		{
-			var success = _database.People.Remove(_database.People.Find(id));
+			var person = peopleData.Find(id);
+			if(person == null)
+			{
+				return false;
+			}
+			var success = peopleData.Remove(person);
+
 			_database.SaveChanges();
 			Refresh();
-
 			return !_database.People.Contains(success.Entity);
 		}
 	}

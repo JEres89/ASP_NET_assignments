@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ASP_NET_assignments.Data;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -47,6 +48,12 @@ namespace ASP_NET_assignments.Models
 					people, CountryName };
 			}
 		}
+		private AppDbContext _database;
+		override internal void setContext(AppDbContext database)
+		{
+			_database = database;
+		}
+
 		static City()
 		{
 			StringifyNames = new string[] {

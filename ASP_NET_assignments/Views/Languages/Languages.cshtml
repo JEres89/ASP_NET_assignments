@@ -1,0 +1,50 @@
+﻿@model LanguageViewModel
+@{
+	ViewData["Title"] = "Languages";
+}
+
+<div class="container" id="Languages_view" style="min-height: 600px;">
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <h1>Languages Index</h1>
+    <div class="row">
+        <div class="col-2">
+            <input type="button" id="show_list" value="List Languages" />
+        </div>
+        <div class="col-2">
+            <input type="button" id="show_details" value="Details" />
+        </div>
+        <div class="col-2">
+            <input type="button" id="new_entry" value="Add a new Language" />
+        </div>
+    </div>
+
+    <p id="message">@Html.Raw(ViewBag.message)</p>
+
+    <div class="container" id="details_container" style="display:none">
+        <input type="number" id="id_text" placeholder="Language ID" />
+        <input type="button" id="get_details" value="Show" />
+        <input type="button" id="remove_row" value="Delete" />
+
+        <div id="details_view">
+        </div>
+    </div>
+    <div id="create_view" style="display:none">
+    </div>
+    <div class="container" id="list_container">
+        <form id="search_entries">
+            <fieldset>
+                <legend>Find Language</legend>
+                <input type="hidden" name="formName" value="search_language" />
+                <input type="text" id="search_value" placeholder="Search" />
+                <input type="submit" id="search_submit" value="Find" />
+            </fieldset>
+        </form>
+
+        <div id="list_view">
+            <partial name="_LanguagesList" model="@Model" />
+        </div>
+    </div>
+
+    <script src="~/Scripts/ListView_scripts.js"></script>
+</div>

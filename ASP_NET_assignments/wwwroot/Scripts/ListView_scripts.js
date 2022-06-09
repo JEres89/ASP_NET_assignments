@@ -22,6 +22,9 @@ function GetDetails() {
 			url: `/${controller}/Details/${id}`,
 			success: function (response) {
 				$("#details_view").html(response);
+				if (controller === "People") {
+					$("#add_lang").show();
+				}
 			},
 			error: function (response) {
 				$("#details_view").html(response.responseJSON);
@@ -47,6 +50,7 @@ $(document).ready(function () {
 
 	$("#show_list").on("click", ShowList);
 	$("#show_details").on("click", ToggleDetails);
+	$("#get_details").on("click", GetDetails);
 	$("#new_entry").on("click", function () {
 		let view = $("#create_view");
 
@@ -58,8 +62,6 @@ $(document).ready(function () {
 			ShowCreate();
 		}
 	});
-
-	$("#get_details").on("click", GetDetails);
 
 	$("#search_entries").on("submit", function (ev) {
 		ev.preventDefault();
@@ -86,10 +88,10 @@ $(document).ready(function () {
 				url: `/${controller}/Delete/${id}`,
 				success: function (response) {
 					$(`#${id}`).remove();
-					$("#details_view").html(response);
+					$("#details_view").html("");
+					$("#message").html(response);
 				},
 				error: function (response) {
-
 					$("#details_view").html(response.responseJSON);
 				}
 			});
@@ -104,13 +106,11 @@ $(document).ready(function () {
 				type: 'POST',
 				url: `/${controller}/Delete/${id}`,
 				success: function (response) {
-					if (row.parent().attr("id") == "details_view") {
+					if (row.parent().attr("id") === "details_view") {
 						$(`#${id}`).remove();
-						$("#details_view").html(response);
-					} else {
-						$("#message").html(response);
-						row.remove;
+						$("#details_view").html("");
 					}
+					$("#message").html(response);
 					row.remove();
 				},
 				error: function () {
@@ -127,5 +127,28 @@ $(document).ready(function () {
 			ShowDetails();
 			GetDetails();
 		}
+	});
+
+	//People specific scripts
+	$("#add_lang").on("click", function () {
+		$("#link_language").show();
+	});
+	$("#details_view").on("submit", "#link_language", function (ev) {
+		ev.preventDefault();
+		let personId = parseInt($(this).prop("name"));
+		let selectedLangs = $("#Languages").val().map(Number);
+		$.ajax(
+			{
+				type: 'POST',
+				url: `/People/AddLang`,
+				data: { personId : personId, selectedLangs: selectedLangs },
+				success: function (response) {
+					$(`#${personId}`).replaceWith(response);
+					GetDetails();
+				},
+				error: function (response) {
+					$("#message").html(response);
+				}
+			});
 	});
 });

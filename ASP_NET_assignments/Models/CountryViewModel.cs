@@ -16,30 +16,23 @@ namespace ASP_NET_assignments.Models
 
 		public string[] ColumnNames { get; set; }
 		public bool ListEnd { get; private set; } = false;
-		public Country GetItem {
+		public Country GetNextItem {
 			get {
-				if(ListEnd)
+				if(ListEnd = !E_countries.MoveNext())
 				{
 					return null;
 				}
-				Country Country = E_countries.Current;
-				ListEnd = !E_countries.MoveNext();
+				Country country = E_countries.Current;
+				country.setContext(_database);
 
-				return Country;
+				return country;
 			}
 		}
-		public bool SetNextItem(int id)
+		public Country GetItem(int id)
 		{
-			Reset();
-			while(E_countries.MoveNext())
-			{
-				if(E_countries.Current.Id == id)
-				{
-					return true;
-				}
-			}
-			Reset();
-			return false;
+			Country c= countriesData.Include(c => c.Cities).FirstOrDefault(c => c.Id == id);
+			c?.setContext(_database);
+			return c;
 		}
 		public CountryViewModel(AppDbContext dbContext)
 		{
@@ -73,12 +66,12 @@ namespace ASP_NET_assignments.Models
 			if(searchModel.Search(value))
 			{
 				E_countries = selectedCountriesData.GetEnumerator();
+				ListEnd = false;
 			}
 			else
 			{
 				Reset();
 			}
-			ListEnd = false;
 		}
 		public void AddItem(Country country)
 		{
@@ -89,7 +82,12 @@ namespace ASP_NET_assignments.Models
 
 		public bool RemoveItem(int id)
 		{
-			var success = _database.Countries.Remove(_database.Countries.Find(id));
+			var country = _database.Countries.Find(id);
+			if(country == null)
+			{
+				return false;
+			}
+			var success = _database.Countries.Remove(country);
 			_database.SaveChanges();
 			Refresh();
 			return !_database.Countries.Contains(success.Entity);

@@ -1,7 +1,6 @@
 ﻿@model CountryViewModel
 
 @{
-	_ = Model.GetItem;
 }
 <style>
 	#countriesList .itemRow:hover {
@@ -26,6 +25,10 @@
 	</div>
 	@while(!Model.ListEnd)
 	{
-		<partial name="_Country" model="Model.GetItem" />
+		var next = Model.GetNextItem;
+		if(next != null)
+		{
+			<partial name="_Country" model="next" />
+		}
 	}
 </div>

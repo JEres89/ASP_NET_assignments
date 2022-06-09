@@ -1,23 +1,24 @@
-﻿@model CityViewModel
+﻿@model LanguageViewModel
 
 @{
 }
 <style>
-	#citiesList .itemRow:hover {
+	#languagesList .itemRow:hover {
 		background-color: moccasin;
 		cursor: pointer;
 	}
+
 	.removeEntitybtn:hover {
 		background-color: orangered;
 		cursor: pointer;
 	}
 </style>
-<div id="citiesList" class="container">
+<div id="languagesList" class="container">
 	<div class="row" id="columnNames">
-		@for(int i = 0 ; i < City.StringifyDisplayNames.Length ; i++)
+		@for(int i = 0 ; i < Language.StringifyDisplayNames.Length ; i++)
 		{
 			<div class="col">
-				@City.StringifyDisplayNames[i]
+				@Language.StringifyDisplayNames[i]
 			</div>
 		}
 		<div class="col">Remove</div>
@@ -27,7 +28,7 @@
 		var next = Model.GetNextItem;
 		if(next != null)
 		{
-			<partial name="_City" model="next" />
+			<partial name="_Language" model="next" />
 		}
 	}
 </div>

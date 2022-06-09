@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
@@ -24,6 +23,29 @@ namespace ASP_NET_assignments.Models
 		}
 		private static List<int> usedIds = new List<int>();
 
+		public static List<PersonLanguage> GetPLSeedData(List<Person> people, List<Language> languages)
+		{
+			List<PersonLanguage> plList = new List<PersonLanguage>();
+			foreach(Person person in people)
+			{
+				PersonLanguage plLanguage = new PersonLanguage() {
+					 PersonId = person.Id,
+					 LanguageId = languages[1].Id
+				};
+				plList.Add(plLanguage);
+
+				int i = rand.Next(2) == 0 ? -1 : 1;
+				plLanguage = new PersonLanguage() {
+					
+					PersonId = person.Id,
+					
+					LanguageId = languages[1+i].Id
+				};
+				plList.Add(plLanguage);
+			}
+
+			return plList;
+		}
 		public static List<T> GetSeedData<T>(T type) where T : I_DbDataModel<T>
 		{
 			List<T> list = new List<T>();
@@ -50,6 +72,13 @@ namespace ASP_NET_assignments.Models
 						type.MakeInstance(new string[]{"Sverige" }),
 						type.MakeInstance(new string[]{"Norge" }),
 						type.MakeInstance(new string[]{"Ingenstans" })
+					});
+					break;
+				case Language _:
+					list.AddRange(new T[] {
+						type.MakeInstance(new string[]{"Svenska"}),
+						type.MakeInstance(new string[]{"Engelska"}),
+						type.MakeInstance(new string[]{"Spanska"}),
 					});
 					break;
 				default:

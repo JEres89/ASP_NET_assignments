@@ -38,28 +38,33 @@ namespace ASP_NET_assignments.Controllers
 		{
 			ViewData.Clear();
 			CountryViewModel model = new CountryViewModel(dbContext);
-			if(id == 0 || !model.SetNextItem(id))
+			Country c = model.GetItem(id);
+			if(c == null)
 			{
 				var json = Json($"A Country with ID {id} does not exist in the database.");
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_Country", model.GetItem);
+			return PartialView("_Country", c);
 		}
 		public IActionResult Create()
 		{
 			ViewData.Clear();
-			ViewBag.CityOptions = new SelectList(dbContext.Cities, "Name", "Name");
+			ViewBag.CityOptions = new SelectList(dbContext.Cities, "Id", "Name");
 			return PartialView("_CreateCountry");
 		}
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(Country country)
+		public IActionResult Create(Country country, int[] cities)
 		{
 			ViewData.Clear();
 			CountryViewModel model = new CountryViewModel(dbContext);
 			if(ModelState.IsValid)
 			{
+				foreach(int cityId in cities)
+				{
+					country.Cities.Add(dbContext.Cities.Find(cityId));
+				}
 				model.AddItem(country);
 				ViewBag.message = "Successfully added the new country";
 				return View("Countries", model);

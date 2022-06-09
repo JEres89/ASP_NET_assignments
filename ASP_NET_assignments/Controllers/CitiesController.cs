@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ASP_NET_assignments.Data;
+﻿using ASP_NET_assignments.Data;
 using ASP_NET_assignments.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ASP_NET_assignments.Controllers
@@ -38,31 +33,38 @@ namespace ASP_NET_assignments.Controllers
 		{
 			ViewData.Clear();
 			CityViewModel model = new CityViewModel(dbContext);
-			if(id == 0 || !model.SetNextItem(id))
+			City c = model.GetItem(id);
+			if(c == null)
 			{
 				var json = Json($"A City with ID {id} does not exist in the database.");
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_City", model.GetItem);
+			return PartialView("_City", c);
 		}
 		public IActionResult Create()
 		{
 			ViewData.Clear();
-			ViewBag.PersonOptions = new SelectList(dbContext.People, "Name", "Name");
+			ViewBag.PersonOptions = new SelectList(dbContext.People, "Id", "Name");
 			ViewBag.CountryOptions = new SelectList(dbContext.Countries, "Name", "Name");
 			return PartialView("_CreateCity");
 		}
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public IActionResult Create(City city)
+		public IActionResult Create(City city, int[] people)
 		{
 			ViewData.Clear();
 			CityViewModel model = new CityViewModel(dbContext);
 			if(ModelState.IsValid)
 			{
+				foreach(int personId in people)
+				{
+					city.People.Add(dbContext.People.Find(personId));
+				}
 				model.AddItem(city);
+
 				ViewBag.message = "Successfully added the new city";
+				
 				return View("Cities", model);
 			}
 			else

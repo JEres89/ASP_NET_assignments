@@ -1,9 +1,13 @@
 ﻿@model Country
 
 @{
+	if(ViewBag.details != null)
+		ViewData["Rowidentifiers"] = $" id=\"details_row\" name={@Model.Id}";
+	else
+		ViewData["Rowidentifiers"] = $" id={@Model.Id}";
 }
 
-<div id="@Model.Id" class="row itemRow">
+<div @ViewData["Rowidentifiers"] class="row itemRow">
 	<div class="col @Html.NameFor(model => model.Id)">
 		@Model.Id
 	</div>

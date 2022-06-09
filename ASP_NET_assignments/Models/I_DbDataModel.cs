@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ASP_NET_assignments.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace ASP_NET_assignments.Models
@@ -11,6 +12,7 @@ namespace ASP_NET_assignments.Models
 		public static string[] StringifyDisplayNames { get; protected set; }
 		public static string TableName { get; protected set; }
 
+		internal abstract void setContext(AppDbContext database);
 		public abstract T MakeInstance(string[] values);
 	}
 }

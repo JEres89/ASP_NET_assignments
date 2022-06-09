@@ -1,16 +1,8 @@
 ﻿using ASP_NET_assignments.Data;
 using ASP_NET_assignments.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
-using System;
-using System.Collections;
 using System.Linq;
-using System.Net.Http;
-using System.Web;
 
 namespace ASP_NET_assignments.Controllers
 {
@@ -26,14 +18,14 @@ namespace ASP_NET_assignments.Controllers
 
 		public IActionResult Index()
 		{
-			return View("People", PeopleViewModel.GetSessionModel(dbContext));
+			return View("People", new PeopleViewModel(dbContext));
 		}
 
 		[HttpPost]
 		public IActionResult Search(string searchValue)
 		{
 			ViewData.Clear();
-			PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
+			PeopleViewModel model = new PeopleViewModel(dbContext);
 			model.Search(searchValue);
 
 			return PartialView("_PeopleList", model);
@@ -42,14 +34,46 @@ namespace ASP_NET_assignments.Controllers
 		public IActionResult Details(int id)
 		{
 			ViewData.Clear();
-			PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
-			if(id == 0 || !model.SetNextItem(id))
+			PeopleViewModel model = new PeopleViewModel(dbContext);
+			Person p = model.GetItem(id);
+			if(p == null)
 			{
 				var json = Json($"A person with ID {id} does not exist in the database.");
 				json.StatusCode = 404;
 				return json;
 			}
-			return PartialView("_person", model.GetItem);
+			ViewBag.details = true;
+			ViewBag.LanguageOptions = new SelectList(dbContext.Languages, "Id", "Name");
+			return PartialView("_Person", p);
+		}
+		[HttpPost]
+		public IActionResult AddLang(int personId, int[] selectedLangs)
+		{
+			ViewData.Clear();
+			Person p;
+			JsonResult json;
+			if((p = dbContext.People.Find(personId)) != null )
+			{
+				var existingPL = dbContext.PersonLanguages.Where(pl => pl.PersonId == personId);
+				dbContext.RemoveRange(existingPL.Where(pl => !selectedLangs.Contains(pl.LanguageId)).ToList());
+				foreach(int langId in selectedLangs)
+				{
+					if(existingPL.Where(pl => pl.LanguageId == langId).Count() == 0)
+					{
+						dbContext.PersonLanguages.Add(new PersonLanguage() { LanguageId = langId, PersonId = personId });
+						dbContext.SaveChanges();
+					}
+				}
+				p.setContext(dbContext);
+				return PartialView("_Person", p);
+			}
+			else
+			{
+				json = Json($"Person not found.");
+				json.StatusCode = 404;
+			}
+			
+			return json;
 		}
 		public IActionResult Create()
 		{
@@ -62,7 +86,7 @@ namespace ASP_NET_assignments.Controllers
 		public IActionResult Create(Person person)
 		{
 			ViewData.Clear();
-			PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
+			PeopleViewModel model = new PeopleViewModel(dbContext);
 			if(ModelState.IsValid)
 			{
 				model.AddItem(person);
@@ -83,7 +107,7 @@ namespace ASP_NET_assignments.Controllers
 			JsonResult json;
 			if (id != null)
 			{
-				PeopleViewModel model = PeopleViewModel.GetSessionModel(dbContext);
+				PeopleViewModel model = new PeopleViewModel(dbContext);
 				if(model.RemoveItem(id.Value))
 				{
 					json = Json($"Person with ID {id} has been removed from the database.");

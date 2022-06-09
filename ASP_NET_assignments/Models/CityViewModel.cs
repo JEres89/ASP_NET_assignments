@@ -16,30 +16,23 @@ namespace ASP_NET_assignments.Models
 
 		public string[] ColumnNames { get; set; }
 		public bool ListEnd { get; private set; } = false;
-		public City GetItem {
+		public City GetNextItem {
 			get {
-				if(ListEnd)
+				if(ListEnd = !E_cities.MoveNext())
 				{
 					return null;
 				}
 				City city = E_cities.Current;
-				ListEnd = !E_cities.MoveNext();
+				city.setContext(_database);
 
 				return city;
 			}
 		}
-		public bool SetNextItem(int id)
+		public City GetItem(int id)
 		{
-			Reset();
-			while(E_cities.MoveNext())
-			{
-				if(E_cities.Current.Id == id)
-				{
-					return true;
-				}
-			}
-			Reset();
-			return false;
+			City c= citiesData.Include(c => c.People).FirstOrDefault(c => c.Id == id);
+			c?.setContext(_database);
+			return c;
 		}
 		public CityViewModel(AppDbContext dbContext)
 		{
@@ -73,12 +66,12 @@ namespace ASP_NET_assignments.Models
 			if(searchModel.Search(value))
 			{
 				E_cities = selectedCitiesData.GetEnumerator();
+				ListEnd = false;
 			}
 			else
 			{
 				Reset();
 			}
-			ListEnd = false;
 		}
 		public void AddItem(City city)
 		{
@@ -89,7 +82,12 @@ namespace ASP_NET_assignments.Models
 
 		public bool RemoveItem(int id)
 		{
-			var success = _database.Cities.Remove(_database.Cities.Find(id));
+			var city = _database.Cities.Find(id);
+			if(city == null)
+			{
+				return false;
+			}
+			var success = _database.Cities.Remove(city);
 			_database.SaveChanges();
 			Refresh();
 			return !_database.Cities.Contains(success.Entity);

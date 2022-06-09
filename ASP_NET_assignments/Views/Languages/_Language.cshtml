@@ -1,4 +1,4 @@
-﻿@model City
+﻿@model Language
 
 @{
 	if(ViewBag.details != null)
@@ -14,11 +14,8 @@
 	<div class="col @Html.NameFor(model => model.Name)">
 		@Model.Name
 	</div>
-	<div class="col @Html.NameFor(model => model.People)">
+	<div class="col @Html.NameFor(model => model.PersonLanguages)">
 		@Model.StringifyValues[2]
-	</div>
-	<div class="col @Html.NameFor(model => model.CountryName)">
-		@Model.CountryName
 	</div>
 
 	<div class="col removeEntitybtn" name="delete_row">Remove</div>

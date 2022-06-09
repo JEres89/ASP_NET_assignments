@@ -1,0 +1,20 @@
+﻿@model Language
+@Html.AntiForgeryToken()
+@{
+}
+
+<form asp-action="Create">
+	<fieldset class="row">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<legend>Add Language</legend>
+		<label asp-for="Name" class="control-label"></label>
+		<input asp-for="Name" id="Name" class="form-control" placeholder="Name of Language" />
+		<span asp-validation-for="Name" class="text-danger"></span>
+
+		<input type="submit" id="create_submit" value="Add Language" />
+	</fieldset>
+</form>
+
+@{
+	await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}

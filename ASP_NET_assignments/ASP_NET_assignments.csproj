@@ -13,6 +13,8 @@
     <Compile Remove="Migrations\20220531151055_Added City Model.Designer.cs" />
     <Compile Remove="Migrations\20220601090804_Added City Model.cs" />
     <Compile Remove="Migrations\20220601090804_Added City Model.Designer.cs" />
+    <Compile Remove="Migrations\20220607120354_Added_PersonLanguage.cs" />
+    <Compile Remove="Migrations\20220607120354_Added_PersonLanguage.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

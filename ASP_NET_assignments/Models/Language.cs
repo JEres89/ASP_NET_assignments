@@ -8,39 +8,40 @@ using System.Text;
 
 namespace ASP_NET_assignments.Models
 {
-	[Table("Countries")]
+	[Table("Languages")]
 	[BindProperties]
-	public class Country : I_DbDataModel<Country>
+	public class Language : I_DbDataModel<Language>
 	{
-		[Display(Name = "Country ID")]
+		[Display(Name = "Language ID")]
 		[Key]
 		[Editable(false)]
 		override public int Id { get; set; }
 
-		[Display(Name = "Country name")]
+		[Display(Name = "Language name")]
 		[Required]
 		public string Name { get; set; }
 
-		[Display(Name = "Cities in Nation")]
-		public List<City> Cities { get; set; } = new List<City>();
+		[Display(Name = "Speakers")]
+		public List<PersonLanguage> PersonLanguages { get; set; } = new List<PersonLanguage>();
 
 		override public string[] StringifyValues {
 			get {
-				string cities = new Func<string>(() => {
+				string people = new Func<string>(() => {
 					StringBuilder s = new StringBuilder();
-					foreach (City c in Cities)
+
+					foreach (PersonLanguage p in PersonLanguages)
 					{
 						if (s.Length != 0)
 						{
 							s.Append(", ");
 						}
-						s.Append(c.Name);
+						s.Append(_database.People.Find(p.PersonId).Name);
 					}
 					return s.ToString();
 				})();
 
 				return new string[] { Id.ToString(), Name,
-					cities };
+					people };
 			}
 		}
 		private AppDbContext _database;
@@ -48,34 +49,35 @@ namespace ASP_NET_assignments.Models
 		{
 			_database = database;
 		}
-		static Country()
+
+		static Language()
 		{
 			StringifyNames = new string[] {
 			"Id", "Name" };
 			StringifyDisplayNames = new string[] {
-			"Country ID", "Country name", "Cities in Nation" };
-			TableName = "Countries";
+			"Language ID", "Language name", "Speakers" };
+			TableName = "Languages";
 		}
-		public Country()
+		public Language()
 		{
 		}
-		private Country(int id, string name)
+		private Language(int id, string name)
 		{
 			Id = id;
 			Name = name;
 		}
-		public Country(string name) : this(
+		public Language(string name) : this(
 			VirtualDatabase.RandId, name)
 		{
 		}
 
-		public override Country MakeInstance(string[] values)
+		public override Language MakeInstance(string[] values)
 		{
 			if(values.Length < 1)
 			{
 				return null;
 			}
-			return new Country(values[0]);
+			return new Language(values[0]);
 		}
 	}
 }
