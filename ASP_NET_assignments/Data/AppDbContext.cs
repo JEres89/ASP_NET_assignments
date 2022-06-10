@@ -1,11 +1,14 @@
 ﻿using ASP_NET_assignments.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ASP_NET_assignments.Data
 {
-	public class AppDbContext : DbContext
+	public class AppDbContext : IdentityDbContext<AppUser>
 	{
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
@@ -19,6 +22,37 @@ namespace ASP_NET_assignments.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			base.OnModelCreating(modelBuilder);
+
+			string adminroleId = "d13ef063-96a1-48b3-949f-f628ba8a0b7a";
+			string userroleId = "43738b5d-1d9a-4337-a794-cc7d6221a3b1";
+			string adminuserId = "72f3b5bb-60e5-4c3a-9857-5b8669db0bf4";
+
+			modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole[] {
+				new IdentityRole{
+					Id = adminroleId,
+					Name = "Admin",
+					NormalizedName = "ADMIN"
+				},
+				new IdentityRole{
+					Id = userroleId,
+					Name = "User",
+					NormalizedName = "USER"
+				}
+			});
+			modelBuilder.Entity<AppUser>().HasData(new AppUser {
+				Id = adminuserId,
+				UserName = "MasterAdmin",
+				NormalizedUserName = "MASTERADMIN",
+				FirstName =	"Jens",
+				LastName = "Eresund",
+				PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "mASTERaDMIN"),
+			});
+			modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string> {
+				RoleId = adminroleId,
+				UserId = adminuserId
+			});
+
 			modelBuilder.Entity<City>()
 				.HasAlternateKey(c => c.Name);
 
@@ -54,8 +88,6 @@ namespace ASP_NET_assignments.Data
 				.HasForeignKey(pl => pl.LanguageId);
 
 
-			//modelBuilder.Entity<Person>().HasMany(p => p.PersonLanguages).
-
 			var pSeedData = VirtualDatabase.GetSeedData(new Person());
 			var cSeedData = VirtualDatabase.GetSeedData(new City());
 			var crSeedData = VirtualDatabase.GetSeedData(new Country());
@@ -70,7 +102,6 @@ namespace ASP_NET_assignments.Data
 
 			modelBuilder.Entity<PersonLanguage>().HasData(plSeedData);
 			
-			//base.OnModelCreating(modelBuilder);
 		}
 	}
 }

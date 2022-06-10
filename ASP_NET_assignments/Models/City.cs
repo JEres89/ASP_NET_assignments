@@ -83,13 +83,13 @@ namespace ASP_NET_assignments.Models
 		{
 		}
 
-		public override City MakeInstance(string[] values)
+		public override City MakeInstance(int id, string[] values)
 		{
 			if(values.Length < 2)
 			{
 				return null;
 			}
-			return new City(values[0], values[1]);
+			return new City(id, values[0], values[1]);
 		}
 	}
 }

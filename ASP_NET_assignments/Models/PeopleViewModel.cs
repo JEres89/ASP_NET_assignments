@@ -8,7 +8,7 @@ namespace ASP_NET_assignments.Models
 {
 	public class PeopleViewModel : I_DataViewModel <Person>
 	{
-		private static PeopleViewModel cache;
+		//private static PeopleViewModel cache;
 		private AppDbContext _database;
 		private DbSet<Person> peopleData;
 		private readonly List<Person> selectedPeopleData;

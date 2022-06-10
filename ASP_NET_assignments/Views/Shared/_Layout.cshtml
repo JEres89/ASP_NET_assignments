@@ -8,14 +8,16 @@
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 	<script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/js/dist/dropdown.js"></script>
 </head>
 <body class="vw-100 vh-100">
 	<div class="container vw-100 vh-100" style="height:100vh;">
 		<header>
 			<nav class="navbar navbar-expand w-100" style="height:100px;">
 				<div class="container w-100">
+					
 					<div class="row align-items-end w-100">
-						<div class="col-2" style="width:100px;">
+						<div class="col-2">
 							<a class="navbar-brand d-inline-block" asp-controller="Home" asp-action="Index"><h2>J.E</h2></a>
 						</div>
 						<div class="col-7">
@@ -36,21 +38,10 @@
 									<a class="nav-link " href="/GuessingGame">Guessing Game</a>
 								</li>
 								<li class="nav-item">
-									<a class="nav-link " asp-controller="People" asp-action="Index">People</a>
+									<a href="/FeverCheck" class="nav-link">Fever?</a>
 								</li>
-								<li class="nav-item">
-									<a class="nav-link " asp-controller="Cities" asp-action="Index">Cities</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" asp-controller="Countries" asp-action="Index">Countries</a>
-								</li>
-								<li class="nav-item">
-									<a class="nav-link" asp-controller="Languages" asp-action="Index">Languages</a>
-								</li>
+								<partial name=_LoginPartial />
 							</ul>
-						</div>
-						<div class="col-1 justify-content-end">
-							<a href="/FeverCheck" class="nav-link">Fever?</a>
 						</div>
 					</div>
 				</div>
@@ -64,5 +55,6 @@
 			</div>
 		</footer>
 	</div>
+	@RenderSection("Scripts", required:false)
 </body>
 </html>

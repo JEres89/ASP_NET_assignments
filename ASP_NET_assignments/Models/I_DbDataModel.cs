@@ -13,6 +13,6 @@ namespace ASP_NET_assignments.Models
 		public static string TableName { get; protected set; }
 
 		internal abstract void setContext(AppDbContext database);
-		public abstract T MakeInstance(string[] values);
+		public abstract T MakeInstance(int id, string[] values);
 	}
 }

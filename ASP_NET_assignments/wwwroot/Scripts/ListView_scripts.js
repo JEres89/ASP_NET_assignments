@@ -12,9 +12,15 @@ function GetCreate() {
 }
 
 function GetDetails() {
-	let id = parseInt($("#id_text").val());
-	if (!id || id < 0) {
-		return;
+	var id;
+	if (controller == "Users") {
+		id = $("#id_text").val();
+	}
+	else {
+		let id = parseInt($("#id_text").val());
+		if (!id || id < 0) {
+			return;
+		}
 	}
 	$.ajax(
 		{
@@ -97,7 +103,7 @@ $(document).ready(function () {
 			});
 	});
 
-	$(`#${controller}_view`).on("click", "[name='delete_row']", function () {
+	$(`#${controller}_view`).on("click", ".removeEntitybtn", function () {
 		let row = $(this).closest(".row");
 
 		let id = parseInt(row.prop("id"));
@@ -129,26 +135,50 @@ $(document).ready(function () {
 		}
 	});
 
-	//People specific scripts
-	$("#add_lang").on("click", function () {
-		$("#link_language").show();
-	});
-	$("#details_view").on("submit", "#link_language", function (ev) {
-		ev.preventDefault();
-		let personId = parseInt($(this).prop("name"));
-		let selectedLangs = $("#Languages").val().map(Number);
-		$.ajax(
-			{
-				type: 'POST',
-				url: `/People/AddLang`,
-				data: { personId : personId, selectedLangs: selectedLangs },
-				success: function (response) {
-					$(`#${personId}`).replaceWith(response);
-					GetDetails();
-				},
-				error: function (response) {
-					$("#message").html(response);
-				}
-			});
-	});
+	if (controller === "People") {
+		//People specific scripts
+		$("#add_lang").on("click", function () {
+			$("#link_language").show();
+		});
+		$("#details_view").on("submit", "#link_language", function (ev) {
+			ev.preventDefault();
+			let personId = parseInt($(this).prop("name"));
+			let selectedLangs = $("#Languages").val().map(Number);
+			$.ajax(
+				{
+					type: 'POST',
+					url: `/People/AddLang`,
+					data: { personId: personId, selectedLangs: selectedLangs },
+					success: function (response) {
+						$(`#${personId}`).replaceWith(response);
+						GetDetails();
+					},
+					error: function (response) {
+						$("#message").html(response);
+					}
+				});
+		});
+	}
+
+	if (controller === "Users") {
+		//User specific scripts
+		$("#show_userslist").on("click", function () {
+
+			$.ajax(
+				{
+					type: 'POST',
+					url: `/Users/GetList`,
+					success: function (response) {
+						$("#list_view").html(response);
+						ShowList();
+					},
+					error: function (response) {
+						$("#message").html(response);
+					}
+				});
+		});
+		$("details_view").on("click", ".detailsCol", function () {
+
+		});
+	}
 });

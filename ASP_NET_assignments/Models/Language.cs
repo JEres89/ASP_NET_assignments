@@ -71,13 +71,13 @@ namespace ASP_NET_assignments.Models
 		{
 		}
 
-		public override Language MakeInstance(string[] values)
+		public override Language MakeInstance(int id, string[] values)
 		{
 			if(values.Length < 1)
 			{
 				return null;
 			}
-			return new Language(values[0]);
+			return new Language(id, values[0]);
 		}
 	}
 }

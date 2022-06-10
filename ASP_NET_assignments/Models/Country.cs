@@ -69,13 +69,13 @@ namespace ASP_NET_assignments.Models
 		{
 		}
 
-		public override Country MakeInstance(string[] values)
+		public override Country MakeInstance(int id, string[] values)
 		{
 			if(values.Length < 1)
 			{
 				return null;
 			}
-			return new Country(values[0]);
+			return new Country(id, values[0]);
 		}
 	}
 }

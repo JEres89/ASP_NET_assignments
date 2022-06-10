@@ -1,10 +1,12 @@
 ﻿using ASP_NET_assignments.Data;
 using ASP_NET_assignments.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ASP_NET_assignments.Controllers
 {
+	[Authorize(Roles = "Admin")]
 	public class CitiesController : Controller
 	{
 		private readonly AppDbContext dbContext;

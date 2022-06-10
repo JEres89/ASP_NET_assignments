@@ -1,0 +1,30 @@
+﻿@model UserViewModel
+
+@{
+}
+<style>
+	#userList .itemRow:hover {
+		background-color: moccasin;
+		cursor: pointer;
+	}
+
+	.removeEntitybtn:hover {
+		background-color: orangered;
+		cursor: pointer;
+	}
+</style>
+<div id="userList" class="container">
+	<div class="row" id="columnNames">
+		@for(int i = 0 ; i < Model.ColumnNames.Count ; i++)
+		{
+			<div class="col">
+				@Model.ColumnNames[i]
+			</div>
+		}
+		<div class="col">Remove</div>
+	</div>
+	@while(Model.NextUser)
+	{
+		<partial name="_User" model="Model" />
+	}
+</div>

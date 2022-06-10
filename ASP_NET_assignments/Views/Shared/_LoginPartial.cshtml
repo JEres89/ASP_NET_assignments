@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ASP_NET_assignments.Models
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@if(SignInManager.IsSignedIn(User))
+{
+	<li class="nav-item">
+		<div class="dropdown">
+			<button class="btn btn-secondary dropdown-toggle" type="button" id="dataMenu" data-bs-toggle="dropdown" aria-expanded="false">
+				Data management
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dataMenu">
+				<a class="dropdown-item" asp-controller="People" asp-action="Index">People</a>
+				@if(( await UserManager.GetRolesAsync(await UserManager.GetUserAsync(User)) ).Contains("Admin"))
+				{
+					<a class="dropdown-item" asp-controller="Cities" asp-action="Index">Cities</a>
+					<a class="dropdown-item" asp-controller="Countries" asp-action="Index">Countries</a>
+					<a class="dropdown-item" asp-controller="Languages" asp-action="Index">Languages</a>
+					<a class="dropdown-item" asp-controller="Users" asp-action="Index">Users</a>
+				}
+			</div>
+		</div>
+	</li>
+	<li class="nav-item">
+		<a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+	</li>
+	<li class="nav-item">
+		<form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+			<button id="logout" type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+		</form>
+	</li>
+}
+else
+{
+	<li class="nav-item">
+		<a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+	</li>
+}

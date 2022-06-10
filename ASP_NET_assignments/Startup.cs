@@ -1,7 +1,9 @@
 using ASP_NET_assignments.Data;
+using ASP_NET_assignments.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +33,12 @@ namespace ASP_NET_assignments
 			services.AddDistributedMemoryCache();
 			services.AddSession();
 			services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+			services.
+				AddIdentity<AppUser, IdentityRole>(options => { options.SignIn.RequireConfirmedAccount = false;
+				}).
+				AddDefaultUI().
+				AddDefaultTokenProviders().
+				AddEntityFrameworkStores<AppDbContext>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +52,9 @@ namespace ASP_NET_assignments
 			app.UseStaticFiles();
 
 			app.UseRouting();
+
+			app.UseAuthentication();
+			app.UseAuthorization();
 
 			app.UseSession();
 
@@ -78,6 +88,7 @@ namespace ASP_NET_assignments
 					new
 					{ controller = "Doctor", action = "FeverCheck" }
 					);
+				endpoints.MapRazorPages();
 				//endpoints.MapControllerRoute(
 				//	"measure",
 				//	"Doctor/FeverCheck/{temp:float}",

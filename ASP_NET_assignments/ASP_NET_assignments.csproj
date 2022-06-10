@@ -15,9 +15,13 @@
     <Compile Remove="Migrations\20220601090804_Added City Model.Designer.cs" />
     <Compile Remove="Migrations\20220607120354_Added_PersonLanguage.cs" />
     <Compile Remove="Migrations\20220607120354_Added_PersonLanguage.Designer.cs" />
+    <Compile Remove="Migrations\20220609105704_Identity_implemented.cs" />
+    <Compile Remove="Migrations\20220609105704_Identity_implemented.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.25" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.25" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.25">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,10 +33,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
     <PackageReference Include="System.Runtime" Version="4.3.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>

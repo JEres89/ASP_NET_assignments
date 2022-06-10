@@ -53,32 +53,32 @@ namespace ASP_NET_assignments.Models
 			{
 				case Person _:
 					list.AddRange( new T[] {
-						type.MakeInstance(new string[]{"Jens Eresund", "+46706845909", "Göteborg" }),
-						type.MakeInstance(new string[]{"Abel Abrahamsson", "+00123456789", "Staden" }),
-						type.MakeInstance(new string[]{"Bror Björn", "+5555555555", "Skogen" }),
-						type.MakeInstance(new string[]{"Örjan Örn", "1111111111", "Luftslottet" })
+						type.MakeInstance(1, new string[]{"Jens Eresund", "+46706845909", "Göteborg" }),
+						type.MakeInstance(2, new string[]{"Abel Abrahamsson", "+00123456789", "Staden" }),
+						type.MakeInstance(3, new string[]{"Bror Björn", "+5555555555", "Skogen" }),
+						type.MakeInstance(4, new string[]{"Örjan Örn", "1111111111", "Luftslottet" })
 					});
 					break;
 				case City _:
 					list.AddRange( new T[] {
-						type.MakeInstance(new string[]{"Göteborg","Sverige"}),
-						type.MakeInstance(new string[]{"Staden","Sverige" }),
-						type.MakeInstance(new string[]{"Skogen","Norge" }),
-						type.MakeInstance(new string[]{"Luftslottet","Ingenstans" })
+						type.MakeInstance(1, new string[]{"Göteborg","Sverige"}),
+						type.MakeInstance(2, new string[]{"Staden","Sverige" }),
+						type.MakeInstance(3, new string[]{"Skogen","Norge" }),
+						type.MakeInstance(4, new string[]{"Luftslottet","Ingenstans" })
 					});
 					break;
 				case Country _:
 					list.AddRange(new T[] {
-						type.MakeInstance(new string[]{"Sverige" }),
-						type.MakeInstance(new string[]{"Norge" }),
-						type.MakeInstance(new string[]{"Ingenstans" })
+						type.MakeInstance(1, new string[]{"Sverige" }),
+						type.MakeInstance(2, new string[]{"Norge" }),
+						type.MakeInstance(3, new string[]{"Ingenstans" })
 					});
 					break;
 				case Language _:
 					list.AddRange(new T[] {
-						type.MakeInstance(new string[]{"Svenska"}),
-						type.MakeInstance(new string[]{"Engelska"}),
-						type.MakeInstance(new string[]{"Spanska"}),
+						type.MakeInstance(1, new string[]{"Svenska"}),
+						type.MakeInstance(2, new string[]{"Engelska"}),
+						type.MakeInstance(3, new string[]{"Spanska"}),
 					});
 					break;
 				default:

@@ -91,13 +91,13 @@ namespace ASP_NET_assignments.Models
 		{
 		}
 
-		public override Person MakeInstance(string[] values)
+		public override Person MakeInstance(int id, string[] values)
 		{
 			if(values.Length<3)
 			{
 				return null;
 			}
-			return new Person(values[0], values[1], values[2]);
+			return new Person(id, values[0], values[1], values[2]);
 		}
 
 		//public static new IQueryable<Person> Search(DbSet<Person> dataSet, string value)

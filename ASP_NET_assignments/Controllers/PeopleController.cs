@@ -1,11 +1,13 @@
 ﻿using ASP_NET_assignments.Data;
 using ASP_NET_assignments.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
 
 namespace ASP_NET_assignments.Controllers
 {
+	[Authorize(Roles = "User")]
 	public class PeopleController : Controller
 	{
 
@@ -61,9 +63,9 @@ namespace ASP_NET_assignments.Controllers
 					if(existingPL.Where(pl => pl.LanguageId == langId).Count() == 0)
 					{
 						dbContext.PersonLanguages.Add(new PersonLanguage() { LanguageId = langId, PersonId = personId });
-						dbContext.SaveChanges();
 					}
 				}
+				dbContext.SaveChanges();
 				p.setContext(dbContext);
 				return PartialView("_Person", p);
 			}
