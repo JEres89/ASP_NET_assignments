@@ -1,4 +1,24 @@
-﻿@model UserViewModel
+﻿@*
+		@model UserViewModel
+	@{
+		AppUser user = Model.CurrentUser;
+
+	}
+
+	<div id="@user.Id" class="row itemRow">
+
+		@for(int i = 0 ; i < Model.ColumnNames.Count ; i++)
+		{
+			<div class="col @Model.ColumnNames[i]">
+				@Model.ColumnValues[i]
+			</div>
+		}
+
+		<div class="col removeEntitybtn">Remove</div>
+	</div>
+*@
+
+@model UserViewModel
 
 @using Microsoft.AspNetCore.Identity
 
@@ -6,53 +26,49 @@
 
 @{
 	AppUser user = Model.CurrentUser;
-	string rowId;
 
 	if(!Model.UseListMode)
 	{
-		rowId = $" id=\"details_row\" name={user.Id}";
 		<style>
-			#details_row .detailsCol:hover {
-				background-color: moccasin;
-				cursor: pointer;
+			#details_row .col {
+				border: solid;
+				border-width: 2px;
 			}
 
-			.removeEntitybtn:hover {
-				background-color: orangered;
-				cursor: pointer;
+			#details_row .detailsCol:hover {
+				background-color: moccasin;
 			}
 		</style>
 	}
 }
 
-@if(!Model.UseListMode)
+@if(Model.UseListMode)
 {
-	<div class="row" id="details_columns">
+	<div id="@user.Id" class="row itemRow">
+
+		@for(int i = 0 ; i < Model.ColumnNames.Count ; i++)
+		{
+			<div class="col @Model.ColumnNames[i]">
+				@Model.ColumnValues[i]
+			</div>
+		}
+
+		<div class="col removeEntitybtn">Remove</div>
+	</div>
+}
+else
+{
+	<div class="row" id="details_row" name="@user.Id">
 		@for(int i = 0 ; i < Model.ColumnNames.Count ; i++)
 		{
 			<div class="col">
-				<span>@Model.ColumnNames[i]</span>
-				<span class="detailsCol" id="Model.ColumnNames[i]">
-					@Model.ColumnValues[i]
-				</span>
+				<span>@Model.ColumnNames[i]</span><br />
+				<span class="detailsCol">@Model.ColumnValues[i]</span>
 			</div>
 		}
 		<div class="col">
-			<span>Remove</span>
-			<span class="col removeEntitybtn" name="delete_row">Remove</span>
+			<span>Roles</span><br />
+			<span class="detailsCol">@Model.CurrentUser.</span>
 		</div>
 	</div>
-}
-else {
-<div  id="@user.Id" class="row itemRow">
-
-	@for(int i = 0 ; i < Model.ColumnNames.Count ; i++)
-	{
-		<div class="col @Model.ColumnNames[i]" >
-			@Model.ColumnValues[i]
-		</div>
-	}
-
-	<div class="col removeEntitybtn" >Remove</div>
-</div>
 }

@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using ASP_NET_assignments.Data;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace ASP_NET_assignments.Models
 {
@@ -9,11 +13,14 @@ namespace ASP_NET_assignments.Models
 		public AppUser()
 		{
 		}
-
+		//[Key]
+		//[Editable(false)]
+		//public override string Id { get; set; }
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public int Birthdate { get; set; }
 		public int UserDetailsColumns { get; set; }
+		public List<IdentityUserRole<string>> IdentityUserRoles { get; set; }
 
 		//public override string Id { get => base.Id; set => base.Id = value; }
 		//public override string UserName { get => base.UserName; set => base.UserName = value; }

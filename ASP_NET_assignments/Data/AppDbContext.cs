@@ -28,6 +28,9 @@ namespace ASP_NET_assignments.Data
 			string userroleId = "43738b5d-1d9a-4337-a794-cc7d6221a3b1";
 			string adminuserId = "72f3b5bb-60e5-4c3a-9857-5b8669db0bf4";
 
+			modelBuilder.Entity<AppUser>().HasKey(u => u.Id);
+			modelBuilder.Entity<AppUser>().HasMany(u=> u.IdentityUserRoles).WithOne().HasForeignKey(ur => ur.UserId).HasPrincipalKey(u => u.Id);
+
 			modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole[] {
 				new IdentityRole{
 					Id = adminroleId,
@@ -46,7 +49,7 @@ namespace ASP_NET_assignments.Data
 				NormalizedUserName = "MASTERADMIN",
 				FirstName =	"Jens",
 				LastName = "Eresund",
-				PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "mASTERaDMIN"),
+				PasswordHash = new PasswordHasher<AppUser>().HashPassword(null, "mASTERaDMIN")
 			});
 			modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string> {
 				RoleId = adminroleId,

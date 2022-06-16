@@ -4,9 +4,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
+using Microsoft.Extensions.Primitives;
+using System.Linq;
 using System.Threading.Tasks;
+using System;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ASP_NET_assignments.Controllers
 {
@@ -43,52 +49,83 @@ namespace ASP_NET_assignments.Controllers
 
 			return PartialView("_UsersList", model);
 		}
-		public async Task<IActionResult> Details(string id)
+
+		/**
+		 * 
+		 */
+		[HttpGet]
+		public IActionResult Details(string id)
 		{
 			ViewData.Clear();
-			UserViewModel model = new UserViewModel(_dbContext, false);
-			model.SetDetailsUser(id, await _userManager.GetUserAsync(User));
-			return PartialView("_User", model);
-		}
-
-		public IActionResult Create()
-		{
-			return View();
-		}
-
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public IActionResult Create(IFormCollection collection)
-		{
-			try
+			if(_dbContext.Users.Find(id)==null)
 			{
-				return RedirectToAction(nameof(Index));
+				return NotFound();
 			}
-			catch
+			else
 			{
-				return View();
+				UserViewModel viewModel = new UserViewModel(_dbContext, false);
+				viewModel.SetDetailsUser(id);
+				return PartialView("_User", viewModel);
 			}
 		}
 
-		public IActionResult Edit(int id)
+		[HttpGet]
+		public async Task<IActionResult> Edit(string id)
 		{
 			ViewData.Clear();
-			UserViewModel model = new UserViewModel(_dbContext, false);
-			return PartialView("_User", model);
-		}
+			if(_dbContext.Users.Find(id) == null)
+			{
+				return NotFound();
+			}
+			else
+			{
+				UserViewModel viewModel = new UserViewModel(_dbContext, false);
+				viewModel.SetDetailsUser(id);
 
+				ViewBag.RoleOptions = viewModel.RolesOptions(await _userManager.GetUserAsync(User));
+				return PartialView("_EditUser", viewModel.CurrentUser);
+			}
+		}
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public IActionResult Edit(int id, IFormCollection collection)
+		public async Task<IActionResult> Edit(string id, [Bind] AppUser user)
 		{
-			try
+			if(id != user.Id)
+				return NotFound();
+			if(ModelState.IsValid)
 			{
-				return RedirectToAction(nameof(Index));
+				var userToUpdate = _dbContext.Users.Find(id);
+
+				if(await TryUpdateModelAsync<AppUser>(userToUpdate, "", u => u.FirstName, u => u.LastName, u=>u.Birthdate, u => u.Email ))
+				{
+					var selectedRoles = new List<string>();
+					foreach(var value in HttpContext.Request.Form.ToList())
+					{
+						if(value.Key.StartsWith("role:"))
+						{
+							selectedRoles.Add(value.Key.Substring(5));
+						}
+					}
+					var extraRoles = _dbContext.UserRoles.Where(ur => ur.UserId == id).Where(ur => !selectedRoles.Contains(ur.RoleId));
+					_dbContext.UserRoles.RemoveRange(extraRoles);
+					foreach(string roleId in selectedRoles)
+					{
+						if(_dbContext.UserRoles.Find(id, roleId) == null)
+						{
+							_dbContext.UserRoles.Add(new IdentityUserRole<string>() {
+								RoleId = roleId,
+								UserId = id
+							});
+						}
+					}
+					await _dbContext.SaveChangesAsync();
+					ViewData.Clear();
+					ViewBag.message = $"Successfully edited user {userToUpdate.UserName}";
+					return View("Users");
+				}
 			}
-			catch
-			{
-				return View();
-			}
+			ViewData.Clear();
+			ViewBag.message = "Error";
+			return PartialView("_EditUser", user);
 		}
 
 		public IActionResult Delete(int id)

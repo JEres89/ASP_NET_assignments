@@ -3,41 +3,46 @@ using ASP_NET_assignments.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace ASP_NET_assignments.Controllers
 {
-	[Authorize(Roles = "User")]
+	[Authorize(Roles = "User,Admin")]
 	public class PeopleController : Controller
 	{
 
-		private readonly AppDbContext dbContext;
+		private readonly AppDbContext _dbContext;
+		private readonly UserManager<AppUser> _userManager;
 
-		public PeopleController(AppDbContext dbContext)
+		public PeopleController(AppDbContext dbContext, UserManager<AppUser> userManager)
 		{
-			this.dbContext = dbContext;
+			this._dbContext = dbContext;
+			this._userManager = userManager;
 		}
 
 		public IActionResult Index()
 		{
-			return View("People", new PeopleViewModel(dbContext));
+			return View("People", new PeopleViewModel(_dbContext));
 		}
 
 		[HttpPost]
 		public IActionResult Search(string searchValue)
 		{
 			ViewData.Clear();
-			PeopleViewModel model = new PeopleViewModel(dbContext);
-			model.Search(searchValue);
+			PeopleViewModel viewModel = new PeopleViewModel(_dbContext);
+			viewModel.Search(searchValue);
 
-			return PartialView("_PeopleList", model);
+			return PartialView("_PeopleList", viewModel);
 		}
 		[HttpGet]
 		public IActionResult Details(int id)
 		{
 			ViewData.Clear();
-			PeopleViewModel model = new PeopleViewModel(dbContext);
-			Person p = model.GetItem(id);
+			PeopleViewModel viewModel = new PeopleViewModel(_dbContext);
+			Person p = viewModel.GetItem(id);
 			if(p == null)
 			{
 				var json = Json($"A person with ID {id} does not exist in the database.");
@@ -45,7 +50,7 @@ namespace ASP_NET_assignments.Controllers
 				return json;
 			}
 			ViewBag.details = true;
-			ViewBag.LanguageOptions = new SelectList(dbContext.Languages, "Id", "Name");
+			ViewBag.LanguageOptions = new SelectList(_dbContext.Languages, "Id", "Name");
 			return PartialView("_Person", p);
 		}
 		[HttpPost]
@@ -54,19 +59,19 @@ namespace ASP_NET_assignments.Controllers
 			ViewData.Clear();
 			Person p;
 			JsonResult json;
-			if((p = dbContext.People.Find(personId)) != null )
+			if((p = _dbContext.People.Find(personId)) != null )
 			{
-				var existingPL = dbContext.PersonLanguages.Where(pl => pl.PersonId == personId);
-				dbContext.RemoveRange(existingPL.Where(pl => !selectedLangs.Contains(pl.LanguageId)).ToList());
+				var existingPL = _dbContext.PersonLanguages.Where(pl => pl.PersonId == personId);
+				_dbContext.RemoveRange(existingPL.Where(pl => !selectedLangs.Contains(pl.LanguageId)).ToList());
 				foreach(int langId in selectedLangs)
 				{
 					if(existingPL.Where(pl => pl.LanguageId == langId).Count() == 0)
 					{
-						dbContext.PersonLanguages.Add(new PersonLanguage() { LanguageId = langId, PersonId = personId });
+						_dbContext.PersonLanguages.Add(new PersonLanguage() { LanguageId = langId, PersonId = personId });
 					}
 				}
-				dbContext.SaveChanges();
-				p.setContext(dbContext);
+				_dbContext.SaveChanges();
+				p.setContext(_dbContext);
 				return PartialView("_Person", p);
 			}
 			else
@@ -80,7 +85,7 @@ namespace ASP_NET_assignments.Controllers
 		public IActionResult Create()
 		{
 			ViewData.Clear();
-			ViewBag.CityOptions = new SelectList(dbContext.Cities, "Name" ,"Name");
+			ViewBag.CityOptions = new SelectList(_dbContext.Cities, "Name" ,"Name");
 			return PartialView("_CreatePerson");
 		}
 		[ValidateAntiForgeryToken]
@@ -88,12 +93,12 @@ namespace ASP_NET_assignments.Controllers
 		public IActionResult Create(Person person)
 		{
 			ViewData.Clear();
-			PeopleViewModel model = new PeopleViewModel(dbContext);
+			PeopleViewModel viewModel = new PeopleViewModel(_dbContext);
 			if(ModelState.IsValid)
 			{
-				model.AddItem(person);
+				viewModel.AddItem(person);
 				ViewBag.message = "Successfully added the new person";
-				return View("People", model);
+				return View("People", viewModel);
 			}
 			else
 			{
@@ -102,6 +107,44 @@ namespace ASP_NET_assignments.Controllers
 			}
 		}
 		[HttpGet]
+		public IActionResult Edit(int id)
+		{
+			ViewData.Clear();
+			if(_dbContext.People.Find(id) == null)
+			{
+				return NotFound();
+			}
+			else
+			{
+				Person person = new PeopleViewModel(_dbContext).GetItem(id);
+				SelectList list = new SelectList(_dbContext.Cities, "Name", "Name");
+				list.First(item => item.Value == person.CityName).Selected = true;
+				ViewBag.CityOptions = list;
+				return PartialView("_EditPerson", person);
+			}
+		}
+		[HttpPost]
+		public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Phonenumber,CityName")] Person person)
+		{
+			if(id != person.Id) return NotFound();
+			if(ModelState.IsValid)
+			{
+				var personToUpdate = _dbContext.People.Find(id);
+
+				if(await TryUpdateModelAsync<Person>(personToUpdate, "", p => p.Name, p => p.Phonenumber, p => p.CityName))
+				{
+					await _dbContext.SaveChangesAsync();
+					ViewData.Clear();
+					ViewBag.message = $"Successfully edited person {personToUpdate.Name}";
+					return View("People");
+				}
+			}
+			ViewData.Clear();
+			ViewBag.message = "Error";
+			return PartialView("_EditPerson", person);
+		}
+
+		[HttpGet]
 		[HttpPost]
 		public IActionResult Delete(int? id)
 		{
@@ -109,8 +152,8 @@ namespace ASP_NET_assignments.Controllers
 			JsonResult json;
 			if (id != null)
 			{
-				PeopleViewModel model = new PeopleViewModel(dbContext);
-				if(model.RemoveItem(id.Value))
+				PeopleViewModel viewModel = new PeopleViewModel(_dbContext);
+				if(viewModel.RemoveItem(id.Value))
 				{
 					json = Json($"Person with ID {id} has been removed from the database.");
 					json.StatusCode = 200;

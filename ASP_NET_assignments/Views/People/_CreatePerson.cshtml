@@ -5,8 +5,8 @@
 
 <form asp-action="Create">
 	<fieldset class="row">
-		<div asp-validation-summary="All" class="text-danger"></div>
 		<legend>Add Person</legend>
+		<div asp-validation-summary="All" class="text-danger"></div>
 		<label asp-for="Name" class="control-label"></label>
 		<input asp-for="Name" id="Name" class="form-control" placeholder="Firstname Lastname" />
 		<span asp-validation-for="Name" class="text-danger"></span>

@@ -14,18 +14,15 @@
 		<div class="col-2">
 			<input type="button" id="show_details" value="Details" />
 		</div>
-		<div class="col-2">
-			<input type="button" id="new_entry" value="Add a new User" />
-		</div>
 	</div>
 
 	<p id="message">@Html.Raw(ViewBag.message) </p>
-
+	
 	<div class="container" id="details_container" style="display:none">
 		<input type="text" id="id_text" placeholder="User ID" />
 		<input type="button" id="get_details" value="Show" />
 		<input type="button" id="remove_row" value="Delete" />
-		<input type="button" id="add_lang" value="Add languages" style="display:none" />
+		<input type="button" id="edit_item" value="Edit" style="display:none" />
 
 		<div id="details_view">
 		</div>

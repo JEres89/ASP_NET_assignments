@@ -15,7 +15,7 @@ namespace ASP_NET_assignments.Models
 		[Display(Name = "City ID")]
 		[Key]
 		[Editable(false)]
-		override public int Id { get; set; }
+		public int Id { get; set; }
 
 		[Display(Name = "City name")]
 		[Required]

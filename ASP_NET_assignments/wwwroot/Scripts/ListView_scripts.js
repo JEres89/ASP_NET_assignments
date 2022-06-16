@@ -11,13 +11,9 @@ function GetCreate() {
 		});
 }
 
-function GetDetails() {
-	var id;
-	if (controller == "Users") {
-		id = $("#id_text").val();
-	}
-	else {
-		let id = parseInt($("#id_text").val());
+function GetDetails(id) {
+	if (controller ==! "Users") {
+		id = parseInt(id);
 		if (!id || id < 0) {
 			return;
 		}
@@ -31,6 +27,7 @@ function GetDetails() {
 				if (controller === "People") {
 					$("#add_lang").show();
 				}
+				$("#edit_item").show();
 			},
 			error: function (response) {
 				$("#details_view").html(response.responseJSON);
@@ -130,9 +127,25 @@ $(document).ready(function () {
 			let entity_id = $(this).closest(".itemRow").prop("id");
 
 			$("#id_text").val(entity_id);
+			GetDetails(entity_id);
 			ShowDetails();
-			GetDetails();
 		}
+	});
+	$("#edit_item").on("click", function () {
+		var id = $("#id_text").val();
+		$.ajax(
+			{
+				type: 'GET',
+				url: `/${controller}/Edit/${id}`,
+				success: function (response) {
+					$("#details_view").html(response);
+					$("#edit_item").hide();
+				},
+				error: function (response) {
+					$("#details_view").html(response.responseJSON);
+				}
+			}
+		);
 	});
 
 	if (controller === "People") {
@@ -176,9 +189,6 @@ $(document).ready(function () {
 						$("#message").html(response);
 					}
 				});
-		});
-		$("details_view").on("click", ".detailsCol", function () {
-
 		});
 	}
 });

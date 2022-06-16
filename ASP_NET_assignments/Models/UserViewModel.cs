@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ASP_NET_assignments.Models
 {
@@ -33,52 +35,29 @@ namespace ASP_NET_assignments.Models
 
 
 		private static List<string> listColumns { get; } = new List<string>{
-			"User ID", "First name", "Last name", "Username", "Email"
+			"First name", "Last name", "Username", "Email"
 		};
-		private List<string> detailsColumns;
+		public List<PropertyInfo> detailsColumns{ get; private set; }
 		public List<string> ColumnNames { 
 			get{
 				if(UseListMode)
 				{
 					return listColumns;
 				}
-				return detailsColumns;
+				return detailsColumns.ConvertAll(I => I.Name);
 			} 
 		}
 
 		private List<string> columnValues;
-
 		public List<string> ColumnValues {
 			get {
 				if(UseListMode)
 				{
 					return new List<string> {
-						CurrentUser.Id, CurrentUser.FirstName, CurrentUser.LastName, CurrentUser.UserName, CurrentUser.Email 
+						CurrentUser.FirstName, CurrentUser.LastName, CurrentUser.UserName, CurrentUser.Email 
 					};
 				}
 				return columnValues;
-			}
-		}
-
-		public void SetDetailsUser(string id, AppUser adminUser)
-		{
-			UseListMode = false;
-			CurrentUser = dbContext.Users.Find(id);
-
-			showCols = new BitArray(new[] { int.MaxValue });
-			props = typeof(AppUser).GetProperties();
-			detailsColumns = new List<string>();
-			columnValues = new List<string>();
-
-			for(int i = 0 ; i < props.Length ; i++)
-			{
-				if(showCols[i])
-				{
-					detailsColumns.Add(props[i].Name);
-					var value = props[i].GetValue(CurrentUser);
-
-					columnValues.Add(value == null ? "null" : value.ToString());
-				}
 			}
 		}
 
@@ -86,6 +65,49 @@ namespace ASP_NET_assignments.Models
 		{
 			this.dbContext = dbContext;
 			this.UseListMode = asList;
+		}
+
+		public void SetDetailsUser(string id)
+		{
+			UseListMode = false;
+			CurrentUser = dbContext.Users.FirstOrDefault(u => u.Id == id);
+
+			showCols = new BitArray(new[] { int.MaxValue });
+			props = typeof(AppUser).GetProperties();
+			detailsColumns = new List<PropertyInfo>();
+			columnValues = new List<string>();
+
+			for(int i = 0 ; i < props.Length ; i++)
+			{
+				if(showCols[i])
+				{
+					detailsColumns.Add(props[i]);
+					var value = props[i].GetValue(CurrentUser);
+
+					columnValues.Add(value == null ? "null" : value.ToString());
+				}
+			}
+		}
+		public List<SelectListItem> RolesOptions(AppUser adminUser)
+		{
+			List<IdentityUserRole<string>> existingRoles = dbContext.UserRoles.Where(role => role.UserId == CurrentUser.Id).ToList();
+
+			List<SelectListItem> roleItems = dbContext.Roles.ToList().ConvertAll(
+				role => new SelectListItem(
+					role.Name,
+					role.Id,
+					existingRoles.Any(
+						currentRole => currentRole.RoleId == role.Id
+					)
+				));
+			//if(adminUser == CurrentUser)
+			//{
+			//	roleItems.Remove(roleItems.Find(role => role.Text == "Admin"));
+			//}
+
+			return roleItems;
+
+			//.Join(CurrentUser.IdentityUserRoles, role => role.Id, userRole => userRole.RoleId, (role, userRole) => role));
 		}
 
 		internal void GetList()
