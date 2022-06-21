@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
@@ -24,8 +23,8 @@ namespace ASP_NET_assignments.Controllers
 
 		public UsersController(AppDbContext dbContext, UserManager<AppUser> userManager)
 		{
-			this._dbContext = dbContext;
-			this._userManager = userManager;
+			_dbContext = dbContext;
+			_userManager = userManager;
 		}
 
 		public IActionResult Index()
@@ -34,18 +33,10 @@ namespace ASP_NET_assignments.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult GetList(string? searchValue)
+		public IActionResult GetList(string searchValue)
 		{
 			ViewData.Clear();
-			UserViewModel model = new UserViewModel(_dbContext, true);
-			if(searchValue == null)
-			{
-				model.GetList();
-			}
-			else
-			{
-				model.Search(searchValue);
-			}
+			UserViewModel model = new UserViewModel(_dbContext, searchValue);
 
 			return PartialView("_UsersList", model);
 		}
@@ -54,7 +45,7 @@ namespace ASP_NET_assignments.Controllers
 		 * 
 		 */
 		[HttpGet]
-		public IActionResult Details(string id)
+		public async Task<IActionResult> DetailsAsync(string id)
 		{
 			ViewData.Clear();
 			if(_dbContext.Users.Find(id)==null)
@@ -63,8 +54,7 @@ namespace ASP_NET_assignments.Controllers
 			}
 			else
 			{
-				UserViewModel viewModel = new UserViewModel(_dbContext, false);
-				viewModel.SetDetailsUser(id);
+				UserViewModel viewModel = new UserViewModel(_dbContext, await _userManager.GetUserAsync(User), id);
 				return PartialView("_User", viewModel);
 			}
 		}
@@ -79,10 +69,9 @@ namespace ASP_NET_assignments.Controllers
 			}
 			else
 			{
-				UserViewModel viewModel = new UserViewModel(_dbContext, false);
-				viewModel.SetDetailsUser(id);
+				UserViewModel viewModel = new UserViewModel(_dbContext, await _userManager.GetUserAsync(User), id);
 
-				ViewBag.RoleOptions = viewModel.RolesOptions(await _userManager.GetUserAsync(User));
+				ViewBag.RoleOptions = viewModel.RolesOptions();
 				return PartialView("_EditUser", viewModel.CurrentUser);
 			}
 		}
@@ -102,7 +91,7 @@ namespace ASP_NET_assignments.Controllers
 					{
 						if(value.Key.StartsWith("role:"))
 						{
-							selectedRoles.Add(value.Key.Substring(5));
+							selectedRoles.Add(value.Key[5..]);
 						}
 					}
 					var extraRoles = _dbContext.UserRoles.Where(ur => ur.UserId == id).Where(ur => !selectedRoles.Contains(ur.RoleId));

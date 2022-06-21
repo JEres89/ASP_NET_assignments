@@ -1,7 +1,9 @@
 ﻿using ASP_NET_assignments.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
@@ -9,13 +11,12 @@ using System.Text;
 namespace ASP_NET_assignments.Models
 {
 	[Table("PeopleDataTable")]
-	[BindProperties]
 	public class Person : I_DbDataModel<Person>
 	{
 
 		[Display(Name = "Person ID")]
 		[Key]
-		[Editable(false)]
+		[ReadOnly(true)]
 		public int Id { get; set; }
 
 		[Display(Name = "Full name")]

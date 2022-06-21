@@ -14,25 +14,20 @@ namespace ASP_NET_assignments.Models
 	{
 		private AppDbContext dbContext;
 
-		private List<AppUser> selectedUsersData;
-		private IEnumerator<AppUser> E_users;
+		private IAsyncEnumerator<AppUser> E_users;
 		public bool ListEnd { get; private set; } = false;
-		public bool UseListMode { get; set; }
+		public bool UseListMode { get; private set; }
 		public bool NextUser {
 			get {
-				if(!UseListMode || ( ListEnd = !E_users.MoveNext() ))
-				{
+				if(!UseListMode || ( ListEnd = !E_users.MoveNextAsync().Result ))
 					return false;
-				}
 				CurrentUser = E_users.Current;
-
 				return true;
 			}
 		}
 		public AppUser CurrentUser { get; private set; }
 		private PropertyInfo[] props;
 		private BitArray showCols;
-
 
 		private static List<string> listColumns { get; } = new List<string>{
 			"First name", "Last name", "Username", "Email"
@@ -61,15 +56,21 @@ namespace ASP_NET_assignments.Models
 			}
 		}
 
-		public UserViewModel(AppDbContext dbContext, bool asList)
+		public UserViewModel(AppDbContext dbContext, string listFilter)
 		{
 			this.dbContext = dbContext;
-			this.UseListMode = asList;
+			UseListMode = true;
+			GenerateList(listFilter);
+		}
+		public UserViewModel(AppDbContext dbContext, AppUser currentAdmin, string detailsOfID)
+		{
+			this.dbContext = dbContext;
+			UseListMode = false;
+			SetDetailsUser(detailsOfID);
 		}
 
 		public void SetDetailsUser(string id)
 		{
-			UseListMode = false;
 			CurrentUser = dbContext.Users.FirstOrDefault(u => u.Id == id);
 
 			showCols = new BitArray(new[] { int.MaxValue });
@@ -88,7 +89,7 @@ namespace ASP_NET_assignments.Models
 				}
 			}
 		}
-		public List<SelectListItem> RolesOptions(AppUser adminUser)
+		public List<SelectListItem> RolesOptions()
 		{
 			List<IdentityUserRole<string>> existingRoles = dbContext.UserRoles.Where(role => role.UserId == CurrentUser.Id).ToList();
 
@@ -110,14 +111,16 @@ namespace ASP_NET_assignments.Models
 			//.Join(CurrentUser.IdentityUserRoles, role => role.Id, userRole => userRole.RoleId, (role, userRole) => role));
 		}
 
-		internal void GetList()
+		private void GenerateList(string filter)
 		{
-			selectedUsersData = dbContext.Users.ToList();
-			E_users = selectedUsersData.GetEnumerator();
+			if(filter != null)
+				Search(filter);
+			else
+				E_users = dbContext.Users.AsAsyncEnumerable().GetAsyncEnumerator();
 		}
-		internal void Search(string? searchValue)
+		internal void Search(string searchValue)
 		{
-			//Search
+			E_users = dbContext.Users.Where(u => u.FirstName.Contains(searchValue) || u.LastName.Contains(searchValue) || u.Email.Contains(searchValue)).AsAsyncEnumerable().GetAsyncEnumerator();
 		}
 
 		public void AddItem(AppUser user)
@@ -126,17 +129,16 @@ namespace ASP_NET_assignments.Models
 			//dbContext.SaveChanges();
 		}
 
-		public bool RemoveItem(int id)
+		public bool RemoveItem(string id)
 		{
 			var user = dbContext.Users.Find(id);
 			if(user == null)
 			{
 				return false;
 			}
-			var success = dbContext.Users.Remove(user);
-
+			var result = dbContext.Users.Remove(user);
 			//dbContext.SaveChanges();
-			return !dbContext.Users.Contains(success.Entity);
+			return result.State	== EntityState.Deleted;
 		}
 	}
 }

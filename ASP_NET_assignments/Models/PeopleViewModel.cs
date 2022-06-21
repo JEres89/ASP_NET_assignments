@@ -15,15 +15,6 @@ namespace ASP_NET_assignments.Models
 		private readonly SearchModel<DbSet<Person>, Person> searchModel;
 		private IEnumerator<Person> E_people;
 
-		//public List<Person> PeopleData {
-		//	get {
-		//		if(searchModel.HasSearched)
-		//		{
-		//			return selectedPeopleData;
-		//		}
-		//		return peopleData.ToList();
-		//	}
-		//}
 		public string[] ColumnNames { get; set; }
 		public bool ListEnd { get; private set; } = false;
 		public Person GetNextItem {
@@ -45,24 +36,6 @@ namespace ASP_NET_assignments.Models
 			p?.setContext(_database);
 			return p;
 		}
-
-		//public static PeopleViewModel GetSessionModel(AppDbContext dbContext)
-		//{
-		//	if(cache == null)
-		//	{
-		//		cache = new PeopleViewModel(dbContext);
-		//	}
-		//	else
-		//	{
-		//		if(cache._database != dbContext)
-		//		{
-		//			cache._database = dbContext;
-		//			cache.searchModel.dataSet = cache.peopleData = cache._database.People;
-		//		}
-		//		else cache.Reset();
-		//	}
-		//	return cache;
-		//}
 
 		public PeopleViewModel(AppDbContext dbContext)
 		{

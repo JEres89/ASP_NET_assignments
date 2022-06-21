@@ -1,11 +1,14 @@
 ﻿using ASP_NET_assignments.Data;
 using ASP_NET_assignments.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Identity;
-using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ASP_NET_assignments.Controllers
@@ -15,12 +18,10 @@ namespace ASP_NET_assignments.Controllers
 	{
 
 		private readonly AppDbContext _dbContext;
-		private readonly UserManager<AppUser> _userManager;
 
-		public PeopleController(AppDbContext dbContext, UserManager<AppUser> userManager)
+		public PeopleController(AppDbContext dbContext)
 		{
 			this._dbContext = dbContext;
-			this._userManager = userManager;
 		}
 
 		public IActionResult Index()
@@ -116,20 +117,22 @@ namespace ASP_NET_assignments.Controllers
 			}
 			else
 			{
-				Person person = new PeopleViewModel(_dbContext).GetItem(id);
-				SelectList list = new SelectList(_dbContext.Cities, "Name", "Name");
-				list.First(item => item.Value == person.CityName).Selected = true;
-				ViewBag.CityOptions = list;
+				Person person = _dbContext.People.Find(id);
+				SelectList cityOptions = new SelectList(_dbContext.Cities, "Name", "Name");
+				cityOptions.First(item => item.Value == person.CityName).Selected = true;
+				ViewBag.CityOptions = cityOptions;
 				return PartialView("_EditPerson", person);
 			}
 		}
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Phonenumber,CityName")] Person person)
 		{
-			if(id != person.Id) return NotFound();
+			if(id != person.Id)
+				return NotFound();
 			if(ModelState.IsValid)
 			{
-				var personToUpdate = _dbContext.People.Find(id);
+				var personToUpdate = _dbContext.People.Find(person.Id);
 
 				if(await TryUpdateModelAsync<Person>(personToUpdate, "", p => p.Name, p => p.Phonenumber, p => p.CityName))
 				{

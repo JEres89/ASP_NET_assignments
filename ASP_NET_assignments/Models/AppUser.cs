@@ -16,8 +16,14 @@ namespace ASP_NET_assignments.Models
 		//[Key]
 		//[Editable(false)]
 		//public override string Id { get; set; }
+		[Display(Name = "Given name")]
+		[Required]
 		public string FirstName { get; set; }
+		[Display(Name = "Surname")]
+		[Required]
 		public string LastName { get; set; }
+		[Display(Name = "Date of Birth")]
+		[Required]
 		public int Birthdate { get; set; }
 		public int UserDetailsColumns { get; set; }
 		public List<IdentityUserRole<string>> IdentityUserRoles { get; set; }
