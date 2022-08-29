@@ -48,7 +48,7 @@ namespace ASP_NET_assignments.Models
 						{
 							s.Append(", ");
 						}
-						s.Append(_database.Languages.Find(l.LanguageId).Name);
+						s.Append(l.Language.Name);
 					}
 					return s.ToString();
 				})();

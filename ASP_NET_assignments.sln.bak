@@ -5,7 +5,11 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASP_NET_assignments", "ASP_NET_assignments\ASP_NET_assignments.csproj", "{B34FAA35-1739-491E-A724-5731ADD3668F}"
 EndProject
-
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "react-front", "react-front\react-front.esproj", "{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B34FAA35-1739-491E-A724-5731ADD3668F} = {B34FAA35-1739-491E-A724-5731ADD3668F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,6 +20,12 @@ Global
 		{B34FAA35-1739-491E-A724-5731ADD3668F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B34FAA35-1739-491E-A724-5731ADD3668F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B34FAA35-1739-491E-A724-5731ADD3668F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2B6FB20-8BFF-4C3F-B04E-B950F6FFC962}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

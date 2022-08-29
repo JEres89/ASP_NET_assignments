@@ -23,6 +23,7 @@ namespace ASP_NET_assignments
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
+				.ConfigureLogging(logBuilder => logBuilder.SetMinimumLevel(LogLevel.Trace))
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();

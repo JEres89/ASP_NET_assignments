@@ -25,10 +25,9 @@ namespace ASP_NET_assignments
 			Configuration = config;
 		}
 
-		// This method gets called by the runtime. Use this method to add services to the container.
-		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddCors(options => options.AddPolicy(name: "AllowCORS", policy => policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowCredentials().AllowAnyMethod().AllowAnyHeader()));
 			services.AddMvc();
 			services.AddDistributedMemoryCache();
 			services.AddSession();
@@ -38,23 +37,25 @@ namespace ASP_NET_assignments
 				.AddDefaultUI()
 				.AddDefaultTokenProviders()
 				.AddEntityFrameworkStores<AppDbContext>();
+			//services.AddSwaggerGen();
+			//services.AddLogging();
 		}
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
+				//app.UseSwagger();
+				//app.UseSwaggerUI();
+				//app.UseRequestResponseLogging();
 			}
-
+			app.UseHttpsRedirection();
 			app.UseStaticFiles();
-
 			app.UseRouting();
-
+			app.UseCors("AllowCORS");
 			app.UseAuthentication();
 			app.UseAuthorization();
-
 			app.UseSession();
 
 			app.UseEndpoints(endpoints =>
@@ -63,6 +64,10 @@ namespace ASP_NET_assignments
 					"default",
 					"{controller=Home}/{action=Index}/{id?}"
 					);
+				//endpoints.MapControllerRoute(
+				//	"api_default",
+				//	"api/{controller=PeopleAPI}/{action=GetPeople}"
+				//	);
 				endpoints.MapControllerRoute(
 					"people",
 					"People",

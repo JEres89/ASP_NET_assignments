@@ -10,7 +10,7 @@ namespace ASP_NET_assignments.Models
 	{
 		//private static PeopleViewModel cache;
 		private AppDbContext _database;
-		private DbSet<Person> peopleData;
+		private List<Person> peopleData;
 		private readonly List<Person> selectedPeopleData;
 		private readonly SearchModel<DbSet<Person>, Person> searchModel;
 		private IEnumerator<Person> E_people;
@@ -30,27 +30,31 @@ namespace ASP_NET_assignments.Models
 			}
 		}
 
+		public List<Person> SelectedPeopleData { 
+			get => searchModel.HasSearched ? selectedPeopleData : peopleData; 
+		}
+
 		public Person GetItem(int id)
 		{
-			Person p= peopleData.Include(p => p.PersonLanguages).FirstOrDefault(p => p.Id == id);
-			p?.setContext(_database);
+			Person p= peopleData.Find(p => p.Id == id);
+			//p?.setContext(_database);
 			return p;
 		}
 
-		public PeopleViewModel(AppDbContext dbContext)
+		public PeopleViewModel(AppDbContext dbContext) : this(dbContext, null){ }
+		public PeopleViewModel(AppDbContext dbContext, string searchValue)
 		{
 			_database = dbContext;
-			_database.People.Include(p => p.PersonLanguages).ToList();
-			peopleData = _database.People;
-			searchModel = new SearchModel<DbSet<Person>, Person>(peopleData);
+			peopleData = _database.People.Include(p => p.PersonLanguages).ThenInclude(pl => pl.Language).ToList();
+			searchModel = new SearchModel<DbSet<Person>, Person>(_database.People);
 			selectedPeopleData = searchModel.Result;
-			Reset();
+			Search(searchValue);
 		}
 		private void Refresh()
 		{
 			if(searchModel.RenewSearch())
 			{	
-				E_people = selectedPeopleData.GetEnumerator();
+				E_people = SelectedPeopleData.GetEnumerator();
 				ListEnd = false;
 			}
 			else
@@ -60,7 +64,7 @@ namespace ASP_NET_assignments.Models
 		}
 		private void Reset()
 		{
-			E_people = peopleData.AsEnumerable().GetEnumerator();
+			E_people = peopleData.GetEnumerator();
 			ListEnd = false;
 			searchModel.ClearSearch();
 		}
@@ -68,7 +72,7 @@ namespace ASP_NET_assignments.Models
 		{
 			if(searchModel.Search(value))
 			{
-				E_people = selectedPeopleData.GetEnumerator();
+				E_people = SelectedPeopleData.GetEnumerator();
 				ListEnd = false;
 			}
 			else
@@ -86,12 +90,12 @@ namespace ASP_NET_assignments.Models
 
 		public bool RemoveItem(int id)
 		{
-			var person = peopleData.Find(id);
+			var person = peopleData.Find(p => p.Id == id);
 			if(person == null)
 			{
 				return false;
 			}
-			var success = peopleData.Remove(person);
+			var success = _database.People.Remove(person);
 
 			_database.SaveChanges();
 			Refresh();
